@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item android:id="@+id/miAttach"
+        android:title="Attach Images"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_attachment_white_24dp"
+        >
+        <menu>
+            <item android:id="@+id/miAttachImageFromFile"
+                android:title="Image from file"
+                android:icon="@drawable/ic_image_black_24dp"
+                />
+            <item android:id="@+id/miAttachImageFromCamera"
+                android:title="Image from Camera"
+                android:icon="@drawable/ic_photo_camera_black_24dp"
+                />
+        </menu>
+    </item>
+    <item android:id="@+id/miSave"
+        android:title="Save"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_save_white_24dp">
+    </item>
+    <item android:id="@+id/miDelete"
+        android:title="Discard"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_delete_white_24dp"
+        >
+
+    </item>
+
+</menu>
