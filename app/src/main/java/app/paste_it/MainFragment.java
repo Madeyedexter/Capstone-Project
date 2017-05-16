@@ -2,20 +2,30 @@ package app.paste_it;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 
+import app.paste_it.adapters.PasteAdapter;
+import app.paste_it.models.greendao.DaoSession;
 import app.paste_it.models.greendao.Paste;
+import app.paste_it.models.greendao.PasteDao;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -24,14 +34,10 @@ import butterknife.ButterKnife;
  * Use the {@link MainFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<ArrayList<Paste>>, View.OnClickListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Paste>>, View.OnClickListener, PasteAdapter.ThumbClickListener, SharedPreferences.OnSharedPreferenceChangeListener{
+
+    private static final String TAG = MainFragment.class.getSimpleName();
+    private static final int ID_PASTE_LOADER = 0;
 
     //views
     @BindView(R.id.toolbar)
@@ -40,6 +46,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     RecyclerView rvPaste;
     @BindView(R.id.fabNewPaste)
     FloatingActionButton fabNewPaste;
+
+    private DaoSession daoSession;
 
 
     public MainFragment() {
@@ -50,16 +58,12 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment MainFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MainFragment newInstance(String param1, String param2) {
+    public static MainFragment newInstance() {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,10 +71,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        daoSession = ((PasteItApplication)getActivity().getApplication()).getDaoSession();
+        PreferenceManager.getDefaultSharedPreferences(getContext()).registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -82,6 +84,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
         fabNewPaste.setOnClickListener(this);
 
+        rvPaste.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        rvPaste.setAdapter(new PasteAdapter(this));
 
         return view;
     }
@@ -93,24 +97,35 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
 
     @Override
-    public Loader<ArrayList<Paste>> onCreateLoader(int id, Bundle args) {
-        return null;
+    public Loader<List<Paste>> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<List<Paste>>(MainFragment.this.getContext()) {
+            @Override
+            public List<Paste> loadInBackground() {
+                PasteDao pasteDao = daoSession.getPasteDao();
+                return pasteDao.loadAll();
+            }
+        };
     }
 
     @Override
-    public void onLoadFinished(Loader<ArrayList<Paste>> loader, ArrayList<Paste> data) {
+    public void onLoadFinished(Loader<List<Paste>> loader, List<Paste> data) {
+        PasteAdapter pasteAdapter = ((PasteAdapter)rvPaste.getAdapter());
+        pasteAdapter.setLoading(false);
+        pasteAdapter.setEnded(true);
+        pasteAdapter.setPastes(data);
 
     }
 
     @Override
-    public void onLoaderReset(Loader<ArrayList<Paste>> loader) {
+    public void onLoaderReset(Loader<List<Paste>> loader) {
 
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getActivity().getSupportLoaderManager();
+        getActivity().getSupportLoaderManager().destroyLoader(ID_PASTE_LOADER);
+        PreferenceManager.getDefaultSharedPreferences(getContext()).unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -119,6 +134,25 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             case R.id.fabNewPaste: startActivity(new Intent(getActivity(),PasteItActivity.class));
                 break;
 
+        }
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getActivity().getSupportLoaderManager().initLoader(ID_PASTE_LOADER,null,this).forceLoad();
+    }
+
+    @Override
+    public void onThumbClicked(Paste paste) {
+
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(getString(R.string.key_paste_added))){
+            Paste paste = daoSession.getPasteDao().load(sharedPreferences.getString(key,null));
+            ((PasteAdapter)rvPaste.getAdapter()).addPaste(0,paste);
         }
     }
 }

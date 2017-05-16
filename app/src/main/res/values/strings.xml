@@ -15,4 +15,5 @@
     </string>
     <string name="web_client_id" translatable="false">634260169983-g5sq00jghrmqj5ta20fphir5kbu3bacc.apps.googleusercontent.com</string>
     <string name="paste_it">Paste It!</string>
+    <string name="key_paste_added">paste_added</string>
 </resources>

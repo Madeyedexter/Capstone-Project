@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
             else{
-                Fragment fragment = MainFragment.newInstance(null,null);
+                Fragment fragment = MainFragment.newInstance();
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame,fragment).commit();
             }
         }

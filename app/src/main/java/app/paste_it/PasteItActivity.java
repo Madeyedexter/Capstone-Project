@@ -136,6 +136,7 @@ public class PasteItActivity extends AppCompatActivity implements AdapterView.On
         intent.putExtra("paste",paste);
         startService(intent);
         Toast.makeText(this,"Your paste will be saved.",Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     @Override
