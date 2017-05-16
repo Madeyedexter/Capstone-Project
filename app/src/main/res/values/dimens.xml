@@ -8,4 +8,5 @@
     <dimen name="toolbar_height">56dp</dimen>
     <dimen name="fab_margin">24dp</dimen>
     <dimen name="margin_viewport">16dp</dimen>
+    <dimen name="padding_text">8dp</dimen>
 </resources>
