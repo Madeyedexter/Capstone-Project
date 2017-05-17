@@ -11,10 +11,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -73,6 +78,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onCreate(savedInstanceState);
         daoSession = ((PasteItApplication)getActivity().getApplication()).getDaoSession();
         PreferenceManager.getDefaultSharedPreferences(getContext()).registerOnSharedPreferenceChangeListener(this);
+
     }
 
     @Override
@@ -81,6 +87,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this,view);
+        AppCompatActivity activity = ((AppCompatActivity)getActivity());
+        activity.setSupportActionBar(mToolbar);
+        activity.setTitle("Paste It!");
+        setHasOptionsMenu(true);
 
         fabNewPaste.setOnClickListener(this);
 
@@ -88,6 +98,27 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         rvPaste.setAdapter(new PasteAdapter(this));
 
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main_fragment,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(TAG,"Option Selected");
+        switch (item.getItemId()){
+            case R.id.miSearch: addSearchFragment();
+                return true;
+            default:return super.onOptionsItemSelected(item);
+        }
+
+    }
+
+    private void addSearchFragment() {
+        SearchFragment searchFragment = SearchFragment.newInstance();
+        getActivity().getSupportFragmentManager().beginTransaction().add(R.id.frame,searchFragment).commit();
     }
 
     @Override
@@ -133,7 +164,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         switch (v.getId()){
             case R.id.fabNewPaste: startActivity(new Intent(getActivity(),PasteItActivity.class));
                 break;
-
         }
     }
 

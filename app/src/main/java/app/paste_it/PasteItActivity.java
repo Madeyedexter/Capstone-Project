@@ -17,8 +17,6 @@ import java.util.ArrayList;
 
 import app.paste_it.adapters.ImageAdapter;
 import app.paste_it.models.firebase.Paste;
-import app.paste_it.models.greendao.ImageURL;
-import app.paste_it.models.greendao.Tag;
 import app.paste_it.service.SavePasteService;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,7 +63,7 @@ public class PasteItActivity extends AppCompatActivity implements AdapterView.On
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.paste_it_menu, menu);
+        getMenuInflater().inflate(R.menu.menu_paste_it, menu);
         return true;
     }
 
