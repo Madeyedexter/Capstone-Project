@@ -16,20 +16,31 @@ import app.paste_it.models.greendao.Paste;
 import app.paste_it.models.holders.LoadingHolder;
 import app.paste_it.models.holders.PasteHolder;
 import app.paste_it.models.holders.TextHolder;
-import butterknife.BindView;
 
 /**
  * Created by Madeyedexter on 16-05-2017.
  */
 
 public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable{
+    public static final int ITEM_TYPE_DATA = 0;
+    public static final int ITEM_TYPE_LOADING = 1;
+    public static final int ITEM_TYPE_ENDED = 2;
+    public static final int ITEM_TYPE_ERROR = 3;
+    public static final int ITEM_TYPE_EMPTY = 4;
+    public static final int ITEM_TYPE_IDLE = 5;
     private static final String TAG = PasteAdapter.class.getSimpleName();
-
+    private final List<Paste> masterPastes = new ArrayList<>();
+    public ThumbClickListener clickListener;
     private boolean loading=false;
-
     private ValueFilter valueFilter;
+    private boolean ended = false;
+    private boolean error = false;
+    private List<Paste> pastes;
 
 
+    public PasteAdapter(ThumbClickListener clickListener) {
+        this.clickListener = clickListener;
+    }
 
     public void setLoading(boolean loading) {
         this.loading = loading;
@@ -46,30 +57,20 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyItemChanged(getItemCount()-1);
     }
 
-    private boolean ended =false;
-    private boolean error =false;
-
-
-    public static final int ITEM_TYPE_DATA = 0;
-    public static final int ITEM_TYPE_LOADING = 1;
-    public static final int ITEM_TYPE_ENDED = 2;
-    public static final int ITEM_TYPE_ERROR = 3;
-    public static final int ITEM_TYPE_EMPTY = 4;
-    public static final int ITEM_TYPE_IDLE = 5;
-
-
-    private List<Paste> pastes;
-
     public List<Paste> getMasterPastes() {
         return masterPastes;
     }
-
-    private final List<Paste> masterPastes = new ArrayList<>();
 
     public void addPaste(int i, Paste paste) {
         masterPastes.add(i,paste);
         pastes.add(i,paste);
         notifyItemInserted(i);
+    }
+
+    public void addPastes(int position, List<Paste> pastes) {
+        masterPastes.addAll(position, pastes);
+        pastes.addAll(position, pastes);
+        notifyItemRangeInserted(position, pastes.size());
     }
 
     @Override
@@ -79,21 +80,11 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return valueFilter;
     }
 
-    public interface ThumbClickListener{
-        void onThumbClicked(Paste paste);
-    }
-
     public void setPastes(List<Paste> pastes) {
         this.pastes = pastes;
         masterPastes.clear();
         masterPastes.addAll(pastes);
         notifyDataSetChanged();
-    }
-
-    public ThumbClickListener clickListener;
-
-    public PasteAdapter(ThumbClickListener clickListener){
-        this.clickListener=clickListener;
     }
 
     @Override
@@ -157,8 +148,6 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return ITEM_TYPE_DATA;
     }
 
-
-
     public void clear(){
         if(pastes!=null) {
             pastes.clear();
@@ -168,6 +157,10 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyDataSetChanged();
     }
 
+
+    public interface ThumbClickListener {
+        void onThumbClicked(Paste paste);
+    }
 
     private class ValueFilter extends Filter {
         @Override

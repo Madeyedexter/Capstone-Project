@@ -43,9 +43,37 @@ public final class Utils {
         }
     }
 
+    public static app.paste_it.models.firebase.Paste toFirebasePaste(Paste paste) {
+        app.paste_it.models.firebase.Paste pasteFB = new app.paste_it.models.firebase.Paste();
+        pasteFB.setId(paste.getId());
+        pasteFB.setCreated(paste.getCreated());
+        pasteFB.setModified(paste.getModified());
+        pasteFB.setTitle(paste.getTitle());
+        pasteFB.setText(paste.getText());
+        List<String> tags = new ArrayList<>();
+        for (Tag tag : paste.getTags()) {
+            tags.add(tag.getLabel());
+        }
+        pasteFB.setTags(tags);
+        List<String> urls = new ArrayList<>();
+        for (ImageURL url : paste.getUrls()) {
+            urls.add(url.getUrl());
+        }
+        pasteFB.setUrls(urls);
+
+        return pasteFB;
+    }
+
+    public static List<app.paste_it.models.firebase.Paste> toFirebasePasteList(List<Paste> pastes) {
+        List<app.paste_it.models.firebase.Paste> firebasePasteList = new ArrayList<>();
+        for (Paste paste : pastes) {
+            firebasePasteList.add(toFirebasePaste(paste));
+        }
+        return firebasePasteList;
+    }
+
     public static Paste toGreenDaoPaste(app.paste_it.models.firebase.Paste paste){
         Paste pasteGD = new Paste();
-
         pasteGD.setId(paste.getId());
         pasteGD.setTitle(paste.getTitle());
         pasteGD.setCreated(paste.getCreated());
@@ -62,8 +90,16 @@ public final class Utils {
             urls.add(new ImageURL(null,url,paste.getId()));
         }
         pasteGD.setUrls(urls);
-
         return pasteGD;
+    }
+
+    public static List<Paste> toGreenDaoPasteList(List<app.paste_it.models.firebase.Paste> pastes) {
+        List<Paste> greenDaoPastesList = new ArrayList<>();
+        for (app.paste_it.models.firebase.Paste paste : pastes) {
+            Paste pasteGD = toGreenDaoPaste(paste);
+            greenDaoPastesList.add(pasteGD);
+        }
+        return greenDaoPastesList;
     }
 
     public static void closeKeyboard(Context c, IBinder windowToken) {

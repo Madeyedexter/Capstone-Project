@@ -3,19 +3,21 @@ package app.paste_it.models.greendao;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.ToMany;
 
 import java.util.List;
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.DaoException;
+
+import app.paste_it.models.Identity;
 
 /**
  * Created by Madeyedexter on 13-05-2017.
  */
 @Entity
-public class Paste implements Parcelable{
+public class Paste implements Parcelable, Identity {
     public static final Creator<Paste> CREATOR = new Creator<Paste>() {
         @Override
         public Paste createFromParcel(Parcel in) {
@@ -93,6 +95,7 @@ public class Paste implements Parcelable{
         return 0;
     }
 
+    @Override
     public String getId() {
         return this.id;
     }

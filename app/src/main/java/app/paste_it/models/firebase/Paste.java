@@ -5,12 +5,14 @@ import android.os.Parcelable;
 
 import java.util.List;
 
+import app.paste_it.models.Identity;
+
 
 /**
  * Created by Madeyedexter on 14-05-2017.
  */
 
-public class Paste implements Parcelable{
+public class Paste implements Parcelable, Identity {
     public static final Creator<Paste> CREATOR = new Creator<Paste>() {
         @Override
         public Paste createFromParcel(Parcel in) {
@@ -38,6 +40,10 @@ public class Paste implements Parcelable{
         tags = in.createStringArrayList();
     }
 
+    public Paste() {
+    }
+
+    @Override
     public String getId() {
         return id;
     }
@@ -116,8 +122,6 @@ public class Paste implements Parcelable{
         dest.writeStringList(urls);
         dest.writeStringList(tags);
     }
-
-    public Paste(){}
 
     @Override
     public int describeContents() {

@@ -1,8 +1,6 @@
 package app.paste_it;
 
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,7 +15,6 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -27,16 +24,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filterable;
 
 import java.util.List;
-import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 
 import app.paste_it.adapters.PasteAdapter;
 import app.paste_it.models.greendao.DaoSession;
 import app.paste_it.models.greendao.Paste;
 import app.paste_it.models.greendao.PasteDao;
+import app.paste_it.service.PasteSyncService;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -190,6 +185,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getActivity().getSupportLoaderManager().initLoader(ID_PASTE_LOADER,null,this).forceLoad();
+        if (!MainActivity.PASTES_SYNCED) {
+            Intent intent = new Intent(getActivity(), PasteSyncService.class);
+            getActivity().startService(intent);
+        }
     }
 
     @Override
@@ -209,6 +208,11 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         if(key.equals(getString(R.string.key_paste_added))){
             Paste paste = daoSession.getPasteDao().load(sharedPreferences.getString(key,null));
             ((PasteAdapter)rvPaste.getAdapter()).addPaste(0,paste);
+        }
+        if (key.equals(getString(R.string.key_pastes_added))) {
+            String ids = sharedPreferences.getString(key, "-1");
+            List<Paste> pastes = daoSession.getPasteDao().queryBuilder().where(PasteDao.Properties.Id.in(ids.split(","))).build().list();
+            ((PasteAdapter) rvPaste.getAdapter()).addPastes(0, pastes);
         }
     }
 }

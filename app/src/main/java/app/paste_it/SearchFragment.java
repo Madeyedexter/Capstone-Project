@@ -10,7 +10,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
-import android.support.v4.text.TextUtilsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -24,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Filterable;
-import android.widget.ImageButton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,14 +51,12 @@ public class SearchFragment extends Fragment implements LoaderManager.LoaderCall
     SearchView svPaste;
     @BindView(R.id.rvSearchResults)
     RecyclerView rvSearchResult;
+    private DaoSession daoSession;
+
 
     public SearchFragment() {
         // Required empty public constructor
     }
-
-
-    private DaoSession daoSession;
-
 
     /**
      * Use this factory method to create a new instance of
@@ -186,7 +182,7 @@ public class SearchFragment extends Fragment implements LoaderManager.LoaderCall
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         List<String> recentSearches = Arrays.asList((sharedPreferences.getString(getString(R.string.key_recent_searches),"").split(",")));
         //if size > 5, retrieve last 4 searches
-        recentSearches = recentSearches.size()>4 ? recentSearches.subList(1,recentSearches.size()-1):recentSearches;
+        recentSearches = recentSearches.size() > 4 ? recentSearches.subList(1, recentSearches.size()) : recentSearches;
         //add this search
         recentSearches.add(0,paste.getId());
         //join the ids
