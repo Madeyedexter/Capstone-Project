@@ -10,8 +10,9 @@
             android:layout_height="wrap_content">
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
+                app:titleTextColor="@color/white"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/toolbar_height"
+                android:layout_height="?attr/actionBarSize"
                 app:layout_scrollFlags="scroll|enterAlways"
                 >
 
@@ -34,6 +35,8 @@
         android:layout_gravity="end|bottom"
         android:src="@drawable/ic_add_white_24dp"
         android:layout_margin="32dp"
+        app:layout_anchor="@id/rvPaste"
+        app:layout_anchorGravity="bottom|right|end"
         />
 
 </android.support.design.widget.CoordinatorLayout>

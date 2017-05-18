@@ -5,6 +5,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +22,14 @@ import butterknife.BindView;
  * Created by Madeyedexter on 16-05-2017.
  */
 
-public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable{
     private static final String TAG = PasteAdapter.class.getSimpleName();
 
     private boolean loading=false;
+
+    private ValueFilter valueFilter;
+
+
 
     public void setLoading(boolean loading) {
         this.loading = loading;
@@ -54,9 +60,23 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private List<Paste> pastes;
 
+    public List<Paste> getMasterPastes() {
+        return masterPastes;
+    }
+
+    private final List<Paste> masterPastes = new ArrayList<>();
+
     public void addPaste(int i, Paste paste) {
+        masterPastes.add(i,paste);
         pastes.add(i,paste);
         notifyItemInserted(i);
+    }
+
+    @Override
+    public Filter getFilter() {
+        if(valueFilter == null)
+            valueFilter = new ValueFilter();
+        return valueFilter;
     }
 
     public interface ThumbClickListener{
@@ -65,6 +85,8 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public void setPastes(List<Paste> pastes) {
         this.pastes = pastes;
+        masterPastes.clear();
+        masterPastes.addAll(pastes);
         notifyDataSetChanged();
     }
 
@@ -138,9 +160,42 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
 
     public void clear(){
-        if(pastes!=null)
+        if(pastes!=null) {
             pastes.clear();
+            masterPastes.clear();
+        }
         resetSpecialStates();
         notifyDataSetChanged();
+    }
+
+
+    private class ValueFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults results = new FilterResults();
+            if (constraint != null && constraint.length() > 0) {
+                List<Paste> filterList = new ArrayList<>();
+                for (int i = 0; i < masterPastes.size(); i++) {
+                    if ((masterPastes.get(i).getText().toLowerCase()).contains(constraint.toString().toLowerCase())) {
+                        filterList.add(masterPastes.get(i));
+                    }
+                }
+                results.count = filterList.size();
+                results.values = filterList;
+            } else {
+                results.count = masterPastes.size();
+                results.values = masterPastes;
+            }
+            return results;
+
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint,
+                                      FilterResults results) {
+            pastes = (List) results.values;
+            notifyDataSetChanged();
+        }
+
     }
 }

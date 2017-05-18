@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/miSearch"
+    <item android:id="@+id/miSearch"
         android:title="Search"
         android:icon="@drawable/ic_search_white_24dp"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
-
+    <item
+        android:id="@+id/miSettings"
+        android:title="Settings"
+        android:icon="@drawable/ic_settings_white_24dp"
+        app:showAsAction="never"/>
 </menu>

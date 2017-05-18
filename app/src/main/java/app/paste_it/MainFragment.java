@@ -1,18 +1,23 @@
 package app.paste_it;
 
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -22,6 +27,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filterable;
 
 import java.util.List;
 import java.util.prefs.PreferenceChangeEvent;
@@ -93,9 +99,20 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         setHasOptionsMenu(true);
 
         fabNewPaste.setOnClickListener(this);
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
 
-        rvPaste.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        rvPaste.setAdapter(new PasteAdapter(this));
+        if(savedInstanceState!= null){
+            Parcelable rvos = savedInstanceState.getParcelable("rvos");
+            staggeredGridLayoutManager.onRestoreInstanceState(rvos);
+            rvPaste.setLayoutManager(staggeredGridLayoutManager);
+            rvPaste.setAdapter(new PasteAdapter(this));
+        }
+        else{
+            rvPaste.setLayoutManager(staggeredGridLayoutManager);
+            rvPaste.setAdapter(new PasteAdapter(this));
+        }
+
+
 
         return view;
     }
@@ -118,7 +135,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private void addSearchFragment() {
         SearchFragment searchFragment = SearchFragment.newInstance();
-        getActivity().getSupportFragmentManager().beginTransaction().add(R.id.frame,searchFragment).commit();
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        transaction.replace(R.id.frame,searchFragment).commit();
     }
 
     @Override
@@ -176,6 +195,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onThumbClicked(Paste paste) {
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Parcelable rvos = rvPaste.getLayoutManager().onSaveInstanceState();
+        outState.putParcelable("rvos",rvos);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
