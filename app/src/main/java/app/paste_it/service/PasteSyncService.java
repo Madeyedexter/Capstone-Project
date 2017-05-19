@@ -13,9 +13,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -40,22 +40,27 @@ public class PasteSyncService extends IntentService {
     private ValueEventListener valueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            List<app.paste_it.models.firebase.Paste> pastes = dataSnapshot.getValue(new GenericTypeIndicator<List<app.paste_it.models.firebase.Paste>>() {
-            });
-            Log.d(TAG, pastes.toString());
-            //we need all items other than the first item
-            //TODO: uncomment the lines after appropriate testing
-            PasteDao pasteDao = ((PasteItApplication) getApplication()).getDaoSession().getPasteDao();
-            pasteDao.saveInTx(Utils.toGreenDaoPasteList(pastes).subList(1, pastes.size()));
-            //notify via shared preferences that multiple pastes have been added
-            String ids = PasteUtils.getPasteIds(pastes);
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(PasteSyncService.this);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(getString(R.string.key_pastes_added), ids);
-            //editor.commit();
-            if (countDownLatch != null)
-                countDownLatch.countDown();
-            Log.d(TAG, "All Opeartions Completed.");
+            List<Paste> pastes = new ArrayList<>();
+            for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                app.paste_it.models.firebase.Paste paste = snap.getValue(app.paste_it.models.firebase.Paste.class);
+                Paste greenPaste = Utils.toGreenDaoPaste(paste);
+                pastes.add(greenPaste);
+            }
+            //we have all the pastes
+            Log.d(TAG,"Paste count from FB is: "+pastes.size());
+            if (pastes.size() > 0) {
+                PasteDao pasteDao = ((PasteItApplication) getApplication()).getDaoSession().getPasteDao();
+                //updated all items
+                pasteDao.insertOrReplaceInTx(pastes, false);
+                //notify via shared preferences that multiple pastes have been added/modified
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(PasteSyncService.this);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(getString(R.string.key_pastes_updated), true);
+                editor.commit();
+                if (countDownLatch != null)
+                    countDownLatch.countDown();
+                Log.d(TAG, "All Operations Completed.");
+            }
             MainActivity.PASTES_SYNCED = true;
         }
 
@@ -79,9 +84,7 @@ public class PasteSyncService extends IntentService {
 
         //One operation to complete, the firebase callback
         countDownLatch = new CountDownLatch(1);
-        PasteDao pasteDao = ((PasteItApplication) getApplication()).getDaoSession().getPasteDao();
-        Paste paste = pasteDao.queryBuilder().orderDesc(PasteDao.Properties.Id).limit(1).build().list().get(0);
-        pasteReference.startAt(paste.getId()).addListenerForSingleValueEvent(valueEventListener);
+        pasteReference.addListenerForSingleValueEvent(valueEventListener);
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {

@@ -40,10 +40,14 @@ import butterknife.ButterKnife;
  * Use the {@link MainFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Paste>>, View.OnClickListener, PasteAdapter.ThumbClickListener, SharedPreferences.OnSharedPreferenceChangeListener{
+public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Paste>>, View.OnClickListener,
+        PasteAdapter.ThumbClickListener, SharedPreferences.OnSharedPreferenceChangeListener, Loader.OnLoadCompleteListener<Paste>
+
+{
 
     private static final String TAG = MainFragment.class.getSimpleName();
     private static final int ID_PASTE_LOADER = 0;
+    private static final int ID_PASTE_REFRESH_LOADER = 1;
 
     //views
     @BindView(R.id.toolbar)
@@ -54,6 +58,30 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     FloatingActionButton fabNewPaste;
 
     private DaoSession daoSession;
+
+    private LoaderManager.LoaderCallbacks<List<Paste>> pasteSyncCallback = new LoaderManager.LoaderCallbacks<List<Paste>>() {
+        @Override
+        public Loader<List<Paste>> onCreateLoader(int id, Bundle args) {
+            return new AsyncTaskLoader<List<Paste>>(getContext()) {
+                @Override
+                public List<Paste> loadInBackground() {
+                    PasteDao pasteDao = daoSession.getPasteDao();
+                    List<Paste> pastes = pasteDao.loadAll();
+                    return pastes;
+                }
+            };
+        }
+
+        @Override
+        public void onLoadFinished(Loader<List<Paste>> loader, List<Paste> data) {
+
+        }
+
+        @Override
+        public void onLoaderReset(Loader<List<Paste>> loader) {
+
+        }
+    };
 
 
     public MainFragment() {
@@ -154,10 +182,18 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoadFinished(Loader<List<Paste>> loader, List<Paste> data) {
-        PasteAdapter pasteAdapter = ((PasteAdapter)rvPaste.getAdapter());
-        pasteAdapter.setLoading(false);
-        pasteAdapter.setEnded(true);
-        pasteAdapter.setPastes(data);
+        Log.d(TAG,"Loader ID is: "+loader.getId());
+        if(loader.getId()==ID_PASTE_LOADER) {
+            PasteAdapter pasteAdapter = ((PasteAdapter) rvPaste.getAdapter());
+            pasteAdapter.setLoading(false);
+            pasteAdapter.setEnded(true);
+            pasteAdapter.setPastes(data);
+        }
+        if(loader.getId()==ID_PASTE_REFRESH_LOADER){
+            PasteAdapter pasteAdapter = ((PasteAdapter) rvPaste.getAdapter());
+            pasteAdapter.clear();
+            pasteAdapter.setPastes(data);
+        }
 
     }
 
@@ -205,14 +241,21 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.d(TAG,"Preferences key: "+key);
         if(key.equals(getString(R.string.key_paste_added))){
             Paste paste = daoSession.getPasteDao().load(sharedPreferences.getString(key,null));
             ((PasteAdapter)rvPaste.getAdapter()).addPaste(0,paste);
         }
-        if (key.equals(getString(R.string.key_pastes_added))) {
-            String ids = sharedPreferences.getString(key, "-1");
-            List<Paste> pastes = daoSession.getPasteDao().queryBuilder().where(PasteDao.Properties.Id.in(ids.split(","))).build().list();
-            ((PasteAdapter) rvPaste.getAdapter()).addPastes(0, pastes);
+        if (key.equals(getString(R.string.key_pastes_updated)) && sharedPreferences.getBoolean(key,false)) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(getString(R.string.key_pastes_updated), false);
+            editor.commit();
+            getActivity().getSupportLoaderManager().restartLoader(ID_PASTE_REFRESH_LOADER,null,this).forceLoad();
         }
+    }
+
+    @Override
+    public void onLoadComplete(Loader loader, Paste data) {
+
     }
 }

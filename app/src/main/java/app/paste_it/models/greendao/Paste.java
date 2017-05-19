@@ -52,6 +52,8 @@ public class Paste implements Parcelable, Identity {
         text = in.readString();
         urls = in.createTypedArrayList(ImageURL.CREATOR);
         tags = in.createTypedArrayList(Tag.CREATOR);
+        created = in.readLong();
+        modified = in.readLong();
     }
 
     @Generated(hash = 1080823105)
@@ -88,6 +90,8 @@ public class Paste implements Parcelable, Identity {
         dest.writeString(text);
         dest.writeTypedList(urls);
         dest.writeTypedList(tags);
+        dest.writeLong(created);
+        dest.writeLong(modified);
     }
 
     @Override

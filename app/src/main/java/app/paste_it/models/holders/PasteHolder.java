@@ -47,14 +47,20 @@ public class PasteHolder extends RecyclerView.ViewHolder implements View.OnClick
     }
 
     public void bindData(Paste paste){
-        if(paste.getTitle()==null || paste.getTitle().length()==0)
+        if(paste.getTitle()==null || paste.getTitle().length()==0) {
             tvTitle.setVisibility(View.GONE);
-        else
+        }
+        else{
+            tvTitle.setVisibility(View.VISIBLE);
             tvTitle.setText(paste.getTitle());
-        if(paste.getText()==null || paste.getText().length()==0)
+        }
+        if(paste.getText()==null || paste.getText().length()==0) {
             tvContent.setVisibility(View.GONE);
-        else
+        }
+        else {
+            tvContent.setVisibility(View.VISIBLE);
             tvContent.setText(paste.getText());
+        }
 
         if(paste.getUrls()!=null && paste.getUrls().size() > 0)
         Picasso.with(rootCard.getContext()).load(paste.getUrls().get(0).getUrl()).into(new Target() {
@@ -81,11 +87,9 @@ public class PasteHolder extends RecyclerView.ViewHolder implements View.OnClick
         else{
             llTagsWrapper.setVisibility(View.VISIBLE);
         }
-
     }
 
     @Override
     public void onClick(View v) {
-
     }
 }

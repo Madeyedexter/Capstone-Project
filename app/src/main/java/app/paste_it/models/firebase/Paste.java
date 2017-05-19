@@ -13,6 +13,43 @@ import app.paste_it.models.Identity;
  */
 
 public class Paste implements Parcelable, Identity {
+    private String id;
+    private Long modified;
+    private Long created;
+    private String title;
+    private String text;
+    private List<String> urls;
+    private List<String> tags;
+
+    public Paste() {
+    }
+
+    protected Paste(Parcel in) {
+        id = in.readString();
+        title = in.readString();
+        text = in.readString();
+        urls = in.createStringArrayList();
+        tags = in.createStringArrayList();
+        created = in.readLong();
+        modified = in.readLong();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(title);
+        dest.writeString(text);
+        dest.writeStringList(urls);
+        dest.writeStringList(tags);
+        dest.writeLong(created);
+        dest.writeLong(modified);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
     public static final Creator<Paste> CREATOR = new Creator<Paste>() {
         @Override
         public Paste createFromParcel(Parcel in) {
@@ -24,24 +61,6 @@ public class Paste implements Parcelable, Identity {
             return new Paste[size];
         }
     };
-    private String id;
-    private Long modified;
-    private Long created;
-    private String title;
-    private String text;
-    private List<String> urls;
-    private List<String> tags;
-
-    protected Paste(Parcel in) {
-        id = in.readString();
-        title = in.readString();
-        text = in.readString();
-        urls = in.createStringArrayList();
-        tags = in.createStringArrayList();
-    }
-
-    public Paste() {
-    }
 
     @Override
     public String getId() {
@@ -114,17 +133,4 @@ public class Paste implements Parcelable, Identity {
 
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(title);
-        dest.writeString(text);
-        dest.writeStringList(urls);
-        dest.writeStringList(tags);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
 }

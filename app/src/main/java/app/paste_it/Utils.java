@@ -80,12 +80,14 @@ public final class Utils {
         pasteGD.setModified(paste.getModified());
         pasteGD.setText(paste.getText());
         List<Tag> tags = new ArrayList<>();
+        if(paste.getTags()!=null)
         for(String tag : paste.getTags()){
             tags.add(new Tag(null,tag,paste.getId()));
         }
         pasteGD.setTags(tags);
 
         List<ImageURL> urls = new ArrayList<>();
+        if(paste.getUrls()!=null)
         for(String url : paste.getUrls()){
             urls.add(new ImageURL(null,url,paste.getId()));
         }
