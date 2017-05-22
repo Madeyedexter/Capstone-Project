@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageButton
+        android:id="@+id/ibDeleteTag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="@dimen/padding_text"
+        android:background="?selectableItemBackground"
+        android:src="@drawable/ic_close_black_24dp" />
+
+    <android.support.v7.widget.AppCompatCheckedTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/ibDeleteTag"
+        android:layout_toRightOf="@+id/ibDeleteTag"
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        android:checked="true"
+        android:gravity="center"
+        android:padding="@dimen/padding_text"
+        tools:text="Tag 1" />
+</RelativeLayout>

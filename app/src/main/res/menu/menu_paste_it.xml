@@ -4,20 +4,25 @@
 
 
     <item android:id="@+id/miAttach"
+        android:icon="@drawable/ic_attachment_white_24dp"
         android:title="Attach Images"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_attachment_white_24dp"
         >
         <menu>
             <item android:id="@+id/miAttachImageFromFile"
-                android:title="Image from file"
                 android:icon="@drawable/ic_image_black_24dp"
+                android:title="Image from file"
                 />
             <item android:id="@+id/miAttachImageFromCamera"
-                android:title="Image from Camera"
                 android:icon="@drawable/ic_photo_camera_black_24dp"
+                android:title="Image from Camera"
                 />
         </menu>
     </item>
+    <item
+        android:id="@+id/miTag"
+        android:icon="@drawable/ic_label_white_24dp"
+        android:title="Tags"
+        app:showAsAction="always" />
 
 </menu>

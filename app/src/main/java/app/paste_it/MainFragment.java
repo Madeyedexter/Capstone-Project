@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 import app.paste_it.adapters.PasteAdapter;
 import app.paste_it.models.DaoSession;
@@ -148,7 +147,6 @@ public class MainFragment extends Fragment implements View.OnClickListener,
      *
      * @return A new instance of fragment MainFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static MainFragment newInstance() {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();

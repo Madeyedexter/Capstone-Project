@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,11 +54,9 @@ public class PasteItActivity extends AppCompatActivity implements AdapterView.On
     EditText etContent;
     @BindView(R.id.etTag)
     EditText etTag;
-    private ImageAdapter imageAdapter;
-
     @BindView(R.id.tvLastUpdated)
     TextView tvLastUpdated;
-
+    private ImageAdapter imageAdapter;
     private Paste paste;
 
     @Override
@@ -115,6 +112,8 @@ public class PasteItActivity extends AppCompatActivity implements AdapterView.On
                 break;
             case R.id.miAttachImageFromFile:
                 pickImage();
+                break;
+            case R.id.miTag:
 
             default:
                 super.onOptionsItemSelected(item);

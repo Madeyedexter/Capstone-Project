@@ -35,21 +35,21 @@
                 android:id="@+id/etTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceMedium"
-                android:hint="Title (Optional)"
-                android:background="@null"
                 android:layout_margin="@dimen/padding_text"
+                android:background="@null"
+                android:hint="Title (Optional)"
+                android:textAppearance="?android:textAppearanceMedium"
                 />
             <EditText
                 android:id="@+id/etContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceMedium"
-                android:hint="Enter text here"
-                android:background="@null"
-                android:minLines="5"
                 android:layout_margin="@dimen/padding_text"
+                android:background="@null"
                 android:gravity="top"
+                android:hint="Enter text here"
+                android:minLines="5"
+                android:textAppearance="?android:textAppearanceMedium"
                 />
             <LinearLayout
                 android:layout_width="match_parent"
@@ -64,15 +64,19 @@
                     />
             </LinearLayout>
             <TextView
-                android:layout_margin="@dimen/padding_text"
                 android:id="@+id/tvLastUpdated"
-                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/padding_text"
+                android:gravity="center"
                 android:textAppearance="@style/TextAppearance.AppCompat"
                 />
         </LinearLayout>
     </ScrollView>
 
-
+    <FrameLayout
+        android:id="@+id/frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBlackTransparent" />
 </android.support.design.widget.CoordinatorLayout>
