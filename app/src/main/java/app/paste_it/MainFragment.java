@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -25,13 +26,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import app.paste_it.adapters.PasteAdapter;
-import app.paste_it.models.greendao.DaoSession;
-import app.paste_it.models.greendao.Paste;
-import app.paste_it.models.greendao.PasteDao;
-import app.paste_it.service.PasteSyncService;
+import app.paste_it.models.DaoSession;
+import app.paste_it.models.ImageModel;
+import app.paste_it.models.ImageModelDao;
+import app.paste_it.models.Paste;
+import app.paste_it.service.ImageUploadService;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -40,13 +55,14 @@ import butterknife.ButterKnife;
  * Use the {@link MainFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Paste>>, View.OnClickListener,
-        PasteAdapter.ThumbClickListener, SharedPreferences.OnSharedPreferenceChangeListener, Loader.OnLoadCompleteListener<Paste>
+public class MainFragment extends Fragment implements View.OnClickListener,
+        PasteAdapter.ThumbClickListener, SharedPreferences.OnSharedPreferenceChangeListener,
+        SwipeRefreshLayout.OnRefreshListener, LoaderManager.LoaderCallbacks<List<ImageModel>>
 
 {
 
     private static final String TAG = MainFragment.class.getSimpleName();
-    private static final int ID_PASTE_LOADER = 0;
+    private static final int ID_IMODEL_LOADER = 0;
     private static final int ID_PASTE_REFRESH_LOADER = 1;
 
     //views
@@ -56,32 +72,70 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     RecyclerView rvPaste;
     @BindView(R.id.fabNewPaste)
     FloatingActionButton fabNewPaste;
+    @BindView(R.id.srLayout)
+    SwipeRefreshLayout srLayout;
 
-    private DaoSession daoSession;
+    private List<ImageModel> imageModels;
 
-    private LoaderManager.LoaderCallbacks<List<Paste>> pasteSyncCallback = new LoaderManager.LoaderCallbacks<List<Paste>>() {
+    private DatabaseReference pasteReference = FirebaseDatabase.getInstance().getReference("pastes/"+ FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+    private ValueEventListener valueEventListener = new ValueEventListener() {
         @Override
-        public Loader<List<Paste>> onCreateLoader(int id, Bundle args) {
-            return new AsyncTaskLoader<List<Paste>>(getContext()) {
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            List<Paste> pastes = new ArrayList<>();
+            for(DataSnapshot dataSnapshotChild : dataSnapshot.getChildren()){
+                pastes.add(dataSnapshotChild.getValue(Paste.class));
+            }
+            Collections.sort(pastes, new Comparator<Paste>() {
                 @Override
-                public List<Paste> loadInBackground() {
-                    PasteDao pasteDao = daoSession.getPasteDao();
-                    List<Paste> pastes = pasteDao.loadAll();
-                    return pastes;
+                public int compare(Paste o1, Paste o2) {
+                    return o2.getId().compareTo(o1.getId());
                 }
-            };
+            });
+            ((PasteAdapter)rvPaste.getAdapter()).setPastes(pastes);
+            srLayout.setRefreshing(false);
         }
 
         @Override
-        public void onLoadFinished(Loader<List<Paste>> loader, List<Paste> data) {
+        public void onCancelled(DatabaseError databaseError) {
+            srLayout.setRefreshing(false);
+        }
+    };
+
+    private ChildEventListener childEventListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+            //This callback will be fired for each paste,
+            Log.d(TAG,"String: "+s+"\nAdded Snapshot: "+dataSnapshot);
+            Paste paste = dataSnapshot.getValue(Paste.class);
+            PasteUtils.resolvePaste(getContext(),paste,(PasteAdapter) rvPaste.getAdapter());
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            Log.d(TAG,"String: "+s+"\nChanged Snapshot: "+dataSnapshot);
+            Paste paste = dataSnapshot.getValue(Paste.class);
+            PasteUtils.resolvePaste(getContext(),paste,(PasteAdapter) rvPaste.getAdapter());
 
         }
 
         @Override
-        public void onLoaderReset(Loader<List<Paste>> loader) {
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+            Log.d(TAG,"Removed Snapshot: "+dataSnapshot);
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
 
         }
     };
+
 
 
     public MainFragment() {
@@ -105,9 +159,25 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        daoSession = ((PasteItApplication)getActivity().getApplication()).getDaoSession();
         PreferenceManager.getDefaultSharedPreferences(getContext()).registerOnSharedPreferenceChangeListener(this);
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        pasteReference.addChildEventListener(childEventListener);
+        getActivity().getSupportLoaderManager().restartLoader(ID_IMODEL_LOADER,null,this);
+        Intent intent  = new Intent(getActivity(), ImageUploadService.class);
+        intent.setAction(ImageUploadService.ACTION_IMAGE_UPLOAD);
+        getActivity().startService(intent);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        pasteReference.removeEventListener(childEventListener);
+        pasteReference.removeEventListener(valueEventListener);
+        getActivity().getSupportLoaderManager().destroyLoader(ID_IMODEL_LOADER);
     }
 
     @Override
@@ -122,7 +192,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         setHasOptionsMenu(true);
 
         fabNewPaste.setOnClickListener(this);
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(Utils.calculateNoOfColumns(getContext()), StaggeredGridLayoutManager.VERTICAL);
+
+        srLayout.setOnRefreshListener(this);
+        srLayout.setColorSchemeResources(R.color.colorPrimary,R.color.colorAccent);
 
         if(savedInstanceState!= null){
             Parcelable rvos = savedInstanceState.getParcelable("rvos");
@@ -135,8 +208,11 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             rvPaste.setAdapter(new PasteAdapter(this));
         }
 
+        pasteReference.orderByKey().addListenerForSingleValueEvent(valueEventListener);
+        srLayout.setRefreshing(true);
 
-
+        Utils.verifyStoragePermissions(getActivity());
+        Utils.verifyManageDocumentsPermissions(getActivity());
         return view;
     }
 
@@ -151,6 +227,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         switch (item.getItemId()){
             case R.id.miSearch: addSearchFragment();
                 return true;
+            case R.id.miLogOut: FirebaseAuth.getInstance().signOut();
             default:return super.onOptionsItemSelected(item);
         }
 
@@ -169,45 +246,14 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
 
-    @Override
-    public Loader<List<Paste>> onCreateLoader(int id, Bundle args) {
-        return new AsyncTaskLoader<List<Paste>>(MainFragment.this.getContext()) {
-            @Override
-            public List<Paste> loadInBackground() {
-                PasteDao pasteDao = daoSession.getPasteDao();
-                return pasteDao.loadAll();
-            }
-        };
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<Paste>> loader, List<Paste> data) {
-        Log.d(TAG,"Loader ID is: "+loader.getId());
-        if(loader.getId()==ID_PASTE_LOADER) {
-            PasteAdapter pasteAdapter = ((PasteAdapter) rvPaste.getAdapter());
-            pasteAdapter.setLoading(false);
-            pasteAdapter.setEnded(true);
-            pasteAdapter.setPastes(data);
-        }
-        if(loader.getId()==ID_PASTE_REFRESH_LOADER){
-            PasteAdapter pasteAdapter = ((PasteAdapter) rvPaste.getAdapter());
-            pasteAdapter.clear();
-            pasteAdapter.setPastes(data);
-        }
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<Paste>> loader) {
-
-    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getActivity().getSupportLoaderManager().destroyLoader(ID_PASTE_LOADER);
         PreferenceManager.getDefaultSharedPreferences(getContext()).unregisterOnSharedPreferenceChangeListener(this);
     }
+
+
 
     @Override
     public void onClick(View v) {
@@ -220,11 +266,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getActivity().getSupportLoaderManager().initLoader(ID_PASTE_LOADER,null,this).forceLoad();
-        if (!MainActivity.PASTES_SYNCED) {
-            Intent intent = new Intent(getActivity(), PasteSyncService.class);
-            getActivity().startService(intent);
-        }
     }
 
     @Override
@@ -241,21 +282,70 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Log.d(TAG,"Preferences key: "+key);
-        if(key.equals(getString(R.string.key_paste_added))){
-            Paste paste = daoSession.getPasteDao().load(sharedPreferences.getString(key,null));
-            ((PasteAdapter)rvPaste.getAdapter()).addPaste(0,paste);
-        }
-        if (key.equals(getString(R.string.key_pastes_updated)) && sharedPreferences.getBoolean(key,false)) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(getString(R.string.key_pastes_updated), false);
-            editor.commit();
-            getActivity().getSupportLoaderManager().restartLoader(ID_PASTE_REFRESH_LOADER,null,this).forceLoad();
+        if(key.equals(getString(R.string.key_image_model_updated))){
+            Log.d(TAG,"Preferences changed with key: "+key);
+            //if we are still here, the user has imported the images and doing some other task
+            //The images have been loaded locally, but not yet uploaded to the cloud
+            Gson gson = new Gson();
+            if(key.equals(getString(R.string.key_image_model_updated))){
+                String jsonString = sharedPreferences.getString(key,"");
+                ImageModel imageModel = gson.fromJson(jsonString,ImageModel.class);
+                int index = PasteUtils.findIndex(imageModels,imageModel);
+                if(index > -1){
+                    imageModels.set(index,imageModel);
+                    PasteAdapter pasteAdapter = (PasteAdapter)rvPaste.getAdapter();
+                    int pasteIndex = PasteUtils.findIndexOfPaste(pasteAdapter.getPastes(),imageModel.getPasteId());
+                    pasteAdapter.notifyItemChanged(pasteIndex);
+                }
+            }
+            if(key.equals(getString(R.string.key_dload_uri_available))){
+                String jsonString = sharedPreferences.getString(key,"");
+                ImageModel imageModel = gson.fromJson(jsonString,ImageModel.class);
+                int index = PasteUtils.findIndex(imageModels,imageModel);
+                if(index > -1){
+                    imageModels.set(index,imageModel);
+                    PasteAdapter pasteAdapter = (PasteAdapter)rvPaste.getAdapter();
+                    int pasteIndex = PasteUtils.findIndexOfPaste(pasteAdapter.getPastes(),imageModel.getPasteId());
+                    pasteAdapter.notifyItemChanged(pasteIndex);
+                }
+            }
         }
     }
 
     @Override
-    public void onLoadComplete(Loader loader, Paste data) {
+    public void onRefresh() {
+        srLayout.setRefreshing(true);
+        pasteReference.addListenerForSingleValueEvent(valueEventListener);
+
+    }
+
+    @Override
+    public Loader<List<ImageModel>> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<List<ImageModel>>(getActivity()) {
+            private DaoSession daoSession;
+            private ImageModelDao imageModelDao;
+
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+                daoSession = ((PasteItApplication)getActivity().getApplication()).getDaoSession();
+                imageModelDao = daoSession.getImageModelDao();
+            }
+
+            @Override
+            public List<ImageModel> loadInBackground() {
+                return imageModelDao.loadAll();
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<ImageModel>> loader, List<ImageModel> data) {
+        imageModels = data;
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<ImageModel>> loader) {
 
     }
 }

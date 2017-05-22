@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import app.paste_it.models.greendao.Paste;
+import app.paste_it.models.Paste;
 import butterknife.ButterKnife;
 
 

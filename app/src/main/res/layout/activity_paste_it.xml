@@ -25,27 +25,20 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_viewport"
             android:orientation="vertical">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rvImages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
             <EditText
                 android:id="@+id/etTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceLarge"
+                android:textAppearance="?android:textAppearanceMedium"
                 android:hint="Title (Optional)"
-                />
-            <ImageView
-                android:id="@+id/ivImage"
-                android:scaleType="centerCrop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <GridView
-                android:id="@+id/gvImages"
-                android:numColumns="auto_fit"
-                android:gravity="center"
-                android:stretchMode="columnWidth"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:background="@null"
+                android:layout_margin="@dimen/padding_text"
                 />
             <EditText
                 android:id="@+id/etContent"
@@ -53,20 +46,31 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:textAppearanceMedium"
                 android:hint="Enter text here"
+                android:background="@null"
                 android:minLines="5"
-                android:gravity="bottom"
+                android:layout_margin="@dimen/padding_text"
+                android:gravity="top"
                 />
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/padding_text"
+                >
                 <EditText
                     android:id="@+id/etTag"
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
-                    android:hint="+ add tags to organize"
-                    android:layout_marginBottom="16dp"
+                    android:hint="Add tags to organize"
                     />
             </LinearLayout>
+            <TextView
+                android:layout_margin="@dimen/padding_text"
+                android:id="@+id/tvLastUpdated"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat"
+                />
         </LinearLayout>
     </ScrollView>
 

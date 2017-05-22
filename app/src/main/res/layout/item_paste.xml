@@ -11,11 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <ImageView
-            android:id="@+id/ivImagePreview"
+        <android.support.v7.widget.RecyclerView
+            android:clickable="false"
+            android:id="@+id/rvImagePreview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scaleType="centerCrop"
             />
         <TextView
             android:id="@+id/tvTitle"

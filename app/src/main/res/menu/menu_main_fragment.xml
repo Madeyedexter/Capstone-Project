@@ -11,4 +11,8 @@
         android:title="Settings"
         android:icon="@drawable/ic_settings_white_24dp"
         app:showAsAction="never"/>
+
+    <item android:id="@+id/miLogOut"
+        android:title="Sign Out"
+        app:showAsAction="never"/>
 </menu>

@@ -1,6 +1,7 @@
 package app.paste_it.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.paste_it.R;
-import app.paste_it.models.greendao.Paste;
+import app.paste_it.models.Paste;
 import app.paste_it.models.holders.LoadingHolder;
 import app.paste_it.models.holders.PasteHolder;
 import app.paste_it.models.holders.TextHolder;
@@ -21,7 +22,7 @@ import app.paste_it.models.holders.TextHolder;
  * Created by Madeyedexter on 16-05-2017.
  */
 
-public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable{
+public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     public static final int ITEM_TYPE_DATA = 0;
     public static final int ITEM_TYPE_LOADING = 1;
     public static final int ITEM_TYPE_ENDED = 2;
@@ -29,13 +30,11 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public static final int ITEM_TYPE_EMPTY = 4;
     public static final int ITEM_TYPE_IDLE = 5;
     private static final String TAG = PasteAdapter.class.getSimpleName();
-    private final List<Paste> masterPastes = new ArrayList<>();
     public ThumbClickListener clickListener;
     private boolean loading=false;
-    private ValueFilter valueFilter;
     private boolean ended = false;
     private boolean error = false;
-    private List<Paste> pastes;
+    private List<Paste> pastes = new ArrayList<>();
 
 
     public PasteAdapter(ThumbClickListener clickListener) {
@@ -57,33 +56,18 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyItemChanged(getItemCount()-1);
     }
 
-    public List<Paste> getMasterPastes() {
-        return masterPastes;
-    }
-
     public void addPaste(int i, Paste paste) {
-        masterPastes.add(i,paste);
         pastes.add(i,paste);
         notifyItemInserted(i);
     }
 
     public void addPastes(int position, List<Paste> pastes) {
-        masterPastes.addAll(position, pastes);
         pastes.addAll(position, pastes);
         notifyItemRangeInserted(position, pastes.size());
     }
 
-    @Override
-    public Filter getFilter() {
-        if(valueFilter == null)
-            valueFilter = new ValueFilter();
-        return valueFilter;
-    }
-
     public void setPastes(List<Paste> pastes) {
         this.pastes = pastes;
-        masterPastes.clear();
-        masterPastes.addAll(pastes);
         notifyDataSetChanged();
     }
 
@@ -94,6 +78,7 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             case ITEM_TYPE_DATA: //default item
                 //Log.d(TAG,"Created MovieHolder");
                 return new PasteHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_paste,parent,false));
+            case ITEM_TYPE_EMPTY: return new RecyclerView.ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_empty_image,parent,false)){};
             case ITEM_TYPE_LOADING: //Loading indicator
                 Log.d(TAG,"Created LoadingHolder");
                 return new LoadingHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_loading,parent,false));
@@ -110,7 +95,12 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 break;
             case ITEM_TYPE_LOADING: break;
             //all others
-            case ITEM_TYPE_EMPTY: ((TextHolder)holder).setLightEmptyMessage("No Items to show here.");
+            case ITEM_TYPE_EMPTY:
+                //When using Staggered Grid Layout Manager, use this to span the item across whole device width
+                //Thanks to Gabriele Mariotti's asnwer on this SO Question:
+                // @link http://stackoverflow.com/questions/33696096/setting-span-size-of-single-row-in-staggeredgridlayoutmanager
+                StaggeredGridLayoutManager.LayoutParams layoutParams = (StaggeredGridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
+                layoutParams.setFullSpan(true);
                 break;
             case ITEM_TYPE_ERROR: ((TextHolder)holder).setLightMessage("An error occurred while fetching data");
                 break;
@@ -151,44 +141,22 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void clear(){
         if(pastes!=null) {
             pastes.clear();
-            masterPastes.clear();
         }
         resetSpecialStates();
         notifyDataSetChanged();
     }
 
+    public void setPaste(int index, Paste pasteGreen) {
+        pastes.set(index,pasteGreen);
+        notifyItemChanged(index);
+    }
+
+    public List<Paste> getPastes() {
+        return pastes;
+    }
+
 
     public interface ThumbClickListener {
         void onThumbClicked(Paste paste);
-    }
-
-    private class ValueFilter extends Filter {
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            FilterResults results = new FilterResults();
-            if (constraint != null && constraint.length() > 0) {
-                List<Paste> filterList = new ArrayList<>();
-                for (int i = 0; i < masterPastes.size(); i++) {
-                    if ((masterPastes.get(i).getText().toLowerCase()).contains(constraint.toString().toLowerCase())) {
-                        filterList.add(masterPastes.get(i));
-                    }
-                }
-                results.count = filterList.size();
-                results.values = filterList;
-            } else {
-                results.count = masterPastes.size();
-                results.values = masterPastes;
-            }
-            return results;
-
-        }
-
-        @Override
-        protected void publishResults(CharSequence constraint,
-                                      FilterResults results) {
-            pastes = (List) results.values;
-            notifyDataSetChanged();
-        }
-
     }
 }

@@ -1,21 +1,26 @@
 package app.paste_it.models.holders;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
+import java.io.File;
+import java.util.ArrayList;
+
+import app.paste_it.PasteUtils;
 import app.paste_it.R;
-import app.paste_it.models.greendao.Paste;
+import app.paste_it.adapters.ImageAdapter;
+import app.paste_it.adapters.PreviewImageAdapter;
+import app.paste_it.models.ImageModel;
+import app.paste_it.models.Paste;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -35,6 +40,8 @@ public class PasteHolder extends RecyclerView.ViewHolder implements View.OnClick
     LinearLayout llTagsWrapper;
     @BindView(R.id.llTagViewGroup)
     LinearLayout llTagViewGroup;
+    @BindView(R.id.rvImagePreview)
+    RecyclerView rvImagePreview;
     CardView rootCard;
 
 
@@ -43,6 +50,7 @@ public class PasteHolder extends RecyclerView.ViewHolder implements View.OnClick
         rootView.setOnClickListener(this);
         rootCard = (CardView)rootView;
         ButterKnife.bind(this,rootView);
+        rvImagePreview.setLayoutManager(new GridLayoutManager(rootView.getContext(),2));
 
     }
 
@@ -62,24 +70,16 @@ public class PasteHolder extends RecyclerView.ViewHolder implements View.OnClick
             tvContent.setText(paste.getText());
         }
 
-        if(paste.getUrls()!=null && paste.getUrls().size() > 0)
-        Picasso.with(rootCard.getContext()).load(paste.getUrls().get(0).getUrl()).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Log.d(TAG, "Bitmap is: "+bitmap.toString());
-                rootCard.setBackground(new BitmapDrawable(rootCard.getResources(), bitmap));
-            }
+        if(paste.getUrls()!=null && paste.getUrls().size() > 0) {
+            Log.d(TAG, "URLS are: " + paste.getUrls());
+            rvImagePreview.setVisibility(View.VISIBLE);
+            rvImagePreview.setAdapter(new PreviewImageAdapter(new ArrayList<>(paste.getUrls().values())));
+        }
+        else {
+            rvImagePreview.setAdapter(null);
+            rvImagePreview.setVisibility(View.GONE);
+        }
 
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                Log.d(TAG, "Bitmap Failed!");
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        });
 
         if(paste.getTags()== null || paste.getTags().size()==0){
             llTagsWrapper.setVisibility(View.GONE);

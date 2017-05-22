@@ -1,37 +1,40 @@
-package app.paste_it.models.firebase;
+package app.paste_it.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import app.paste_it.models.Identity;
+import java.util.Map;
 
 
 /**
  * Created by Madeyedexter on 14-05-2017.
  */
-
-public class Paste implements Parcelable, Identity {
+public class Paste implements Parcelable {
     private String id;
     private Long modified;
     private Long created;
     private String title;
     private String text;
-    private List<String> urls;
-    private List<String> tags;
+    private Map<String, ImageModel> urls = new HashMap<>();
+    private boolean archived;
 
-    public Paste() {
-    }
+    public Paste(){}
 
     protected Paste(Parcel in) {
         id = in.readString();
         title = in.readString();
         text = in.readString();
-        urls = in.createStringArrayList();
-        tags = in.createStringArrayList();
-        created = in.readLong();
-        modified = in.readLong();
+        archived = in.readByte() != 0;
+        tags = in.createTypedArrayList(Tag.CREATOR);
+        //LongSparseArray may be an alternative here
+        urls = new HashMap<>();
+        ArrayList<ImageModel> imageModelArrayList = in.createTypedArrayList(ImageModel.CREATOR);
+        for(ImageModel imageModel : imageModelArrayList){
+            urls.put(imageModel.getId(),imageModel);
+        }
     }
 
     @Override
@@ -39,10 +42,9 @@ public class Paste implements Parcelable, Identity {
         dest.writeString(id);
         dest.writeString(title);
         dest.writeString(text);
-        dest.writeStringList(urls);
-        dest.writeStringList(tags);
-        dest.writeLong(created);
-        dest.writeLong(modified);
+        dest.writeByte((byte) (archived ? 1 : 0));
+        dest.writeTypedList(tags);
+        dest.writeTypedList(new ArrayList<Parcelable>(urls.values()));
     }
 
     @Override
@@ -62,7 +64,30 @@ public class Paste implements Parcelable, Identity {
         }
     };
 
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
+    }
+
     @Override
+    public String toString() {
+        return "Paste{" +
+                "id='" + id + '\'' +
+                ", modified=" + modified +
+
+                ", created=" + created +
+                ", title='" + title + '\'' +
+                ", text='" + text + '\'' +
+                ", urls=" + urls +
+                ", tags=" + tags +
+                '}';
+    }
+
+    private List<Tag> tags;
+
     public String getId() {
         return id;
     }
@@ -103,34 +128,20 @@ public class Paste implements Parcelable, Identity {
         this.text = text;
     }
 
-    public List<String> getUrls() {
+    public Map<String, ImageModel> getUrls() {
         return urls;
     }
 
-    public void setUrls(List<String> urls) {
+    public void setUrls(HashMap<String, ImageModel> urls) {
         this.urls = urls;
     }
 
-    public List<String> getTags() {
+    public List<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(List<Tag> tags) {
         this.tags = tags;
-    }
-
-    @Override
-    public String toString() {
-        return "Paste{" +
-                "id='" + id + '\'' +
-                ", modified=" + modified +
-                ", created=" + created +
-                ", title='" + title + '\'' +
-                ", text='" + text + '\'' +
-                ", urls=" + urls +
-                ", tags=" + tags +
-                '}';
-
     }
 
 }

@@ -22,4 +22,8 @@
     <string name="key_recent_searches">recent_searches</string>
     <string name="key_pastes_added">pastes_added</string>
     <string name="key_pastes_updated">pastes_updated</string>
+    <string name="key_paste">paste</string>
+    <string name="key_image_models">image_models</string>
+    <string name="key_image_model_updated">image_model_updated</string>
+    <string name="key_dload_uri_available">key_dload_uri_available</string>
 </resources>

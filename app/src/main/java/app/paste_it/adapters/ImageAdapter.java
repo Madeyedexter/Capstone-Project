@@ -2,6 +2,7 @@ package app.paste_it.adapters;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,44 +12,53 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImageAdapter extends BaseAdapter {
+import app.paste_it.models.ImageModel;
+
+public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String TAG = ImageAdapter.class.getSimpleName();
 
-    private Context mContext;
+    public List<ImageModel> getItems() {
+        return items;
+    }
 
-    private List<Uri> items;
+    private List<ImageModel> items;
 
-    public ImageAdapter(Context c) {
-        mContext = c;
+    public ImageAdapter() {
         items = new ArrayList<>();
     }
 
-    public int getCount() {
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        ImageView imageView = new ImageView(parent.getContext());
+        return new RecyclerView.ViewHolder(imageView) {};
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        ImageView imageView = (ImageView)holder.itemView;
+        String path = holder.itemView.getContext().getFilesDir().getPath()+"/"+items.get(position).getFileName();
+        File file = new File(path);
+        if(file.exists()){
+            Picasso.with(imageView.getContext()).load(file).centerCrop().into(imageView);
+        }
+        else{
+            imageView.setImageBitmap(null);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
         return items==null?0:items.size();
     }
 
-    public Uri getItem(int position) {
-        return items.get(position);
-    }
-
-    public long getItemId(int position) {
-        return items.get(position).hashCode();
-    }
-
-    // create a new ImageView for each item referenced by the Adapter
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView = (convertView == null?new ImageView(mContext):(ImageView) convertView);
-        Picasso.with(mContext).load(items.get(position)).into(imageView);
-        return imageView;
-    }
-
-    public void addUri(Uri uri){
-        items.add(uri);
-        notifyDataSetChanged();
+    public void addItem(ImageModel imageModel){
+        items.add(imageModel);
+        notifyItemInserted(getItemCount()-1);
     }
 }

@@ -2,11 +2,11 @@ package app.paste_it;
 
 import android.app.Application;
 
-import org.greenrobot.greendao.AbstractDaoMaster;
+import com.google.firebase.database.FirebaseDatabase;
 import org.greenrobot.greendao.database.Database;
 
-import app.paste_it.models.greendao.DaoMaster;
-import app.paste_it.models.greendao.DaoSession;
+import app.paste_it.models.DaoMaster;
+import app.paste_it.models.DaoSession;
 
 
 /**
@@ -22,6 +22,7 @@ public class PasteItApplication extends Application {
         super.onCreate();
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "pasteit-db");
         Database db = helper.getWritableDb();
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         daoSession = new DaoMaster(db).newSession();
     }
 

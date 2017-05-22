@@ -29,9 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import app.paste_it.adapters.PasteAdapter;
-import app.paste_it.models.firebase.Paste;
-import app.paste_it.models.greendao.DaoSession;
-import app.paste_it.models.greendao.PasteDao;
+import app.paste_it.models.Paste;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -41,7 +39,7 @@ import butterknife.ButterKnife;
  * Use the {@link SearchFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SearchFragment extends Fragment implements LoaderManager.LoaderCallbacks<ArrayList<Paste>>, View.OnClickListener, PasteAdapter.ThumbClickListener, SearchView.OnQueryTextListener{
+public class SearchFragment extends Fragment implements View.OnClickListener, PasteAdapter.ThumbClickListener, SearchView.OnQueryTextListener{
 
     private static final int ID_LOADER_SEARCH_RESULT = 1;
 
@@ -51,7 +49,6 @@ public class SearchFragment extends Fragment implements LoaderManager.LoaderCall
     SearchView svPaste;
     @BindView(R.id.rvSearchResults)
     RecyclerView rvSearchResult;
-    private DaoSession daoSession;
 
 
     public SearchFragment() {
@@ -77,16 +74,11 @@ public class SearchFragment extends Fragment implements LoaderManager.LoaderCall
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
         }
-
-        daoSession = ((PasteItApplication)getActivity().getApplication()).getDaoSession();
-
-        getActivity().getSupportLoaderManager().initLoader(ID_LOADER_SEARCH_RESULT,null, this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getActivity().getSupportLoaderManager().destroyLoader(ID_LOADER_SEARCH_RESULT);
     }
 
     @Override
@@ -131,37 +123,13 @@ public class SearchFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public Loader<ArrayList<Paste>> onCreateLoader(int id, Bundle args) {
-        return new AsyncTaskLoader<ArrayList<Paste>>(getContext()) {
-            @Override
-            public ArrayList<Paste> loadInBackground() {
-                ArrayList<Paste> pastes = new ArrayList<>();
-                PasteDao pasteDao = daoSession.getPasteDao();
-                //TODO: load based on search string
-
-                return pastes;
-            }
-        };
-    }
-
-    @Override
-    public void onLoadFinished(Loader<ArrayList<Paste>> loader, ArrayList<Paste> data) {
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<ArrayList<Paste>> loader) {
-
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()){
         }
     }
 
     @Override
-    public void onThumbClicked(app.paste_it.models.greendao.Paste paste) {
+    public void onThumbClicked(Paste paste) {
         updateRecentSearch(paste);
         viewPaste(paste);
 
@@ -173,11 +141,11 @@ public class SearchFragment extends Fragment implements LoaderManager.LoaderCall
 
     }
 
-    private void viewPaste(app.paste_it.models.greendao.Paste paste) {
+    private void viewPaste(Paste paste) {
 
     }
 
-    private void updateRecentSearch(app.paste_it.models.greendao.Paste paste) {
+    private void updateRecentSearch(Paste paste) {
         //clicked on a search item, save the id of the paste as a recently seacrhed paste.
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         List<String> recentSearches = Arrays.asList((sharedPreferences.getString(getString(R.string.key_recent_searches),"").split(",")));

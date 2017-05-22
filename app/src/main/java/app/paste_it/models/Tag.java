@@ -1,9 +1,7 @@
-package app.paste_it.models.greendao;
+package app.paste_it.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.google.firebase.database.Exclude;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
@@ -13,52 +11,51 @@ import org.greenrobot.greendao.annotation.Generated;
  * Created by Madeyedexter on 13-05-2017.
  */
 @Entity
-public class ImageURL implements Parcelable {
-    public static final Creator<ImageURL> CREATOR = new Creator<ImageURL>() {
+public class Tag implements Parcelable {
+    public static final Creator<Tag> CREATOR = new Creator<Tag>() {
         @Override
-        public ImageURL createFromParcel(Parcel in) {
-            return new ImageURL(in);
+        public Tag createFromParcel(Parcel in) {
+            return new Tag(in);
         }
 
         @Override
-        public ImageURL[] newArray(int size) {
-            return new ImageURL[size];
+        public Tag[] newArray(int size) {
+            return new Tag[size];
         }
     };
     @Id(autoincrement = true)
     private Long id;
-    private String url;
+    private String label;
     private String pasteId;
 
-    protected ImageURL(Parcel in) {
-        url = in.readString();
-
+    protected Tag(Parcel in) {
+        label = in.readString();
         pasteId = in.readString();
     }
 
-    @Generated(hash = 639769370)
-    public ImageURL(Long id, String url, String pasteId) {
+    @Generated(hash = 1997334013)
+    public Tag(Long id, String label, String pasteId) {
         this.id = id;
-        this.url = url;
+        this.label = label;
         this.pasteId = pasteId;
     }
 
-    @Generated(hash = 661544148)
-    public ImageURL() {
+    @Generated(hash = 1605720318)
+    public Tag() {
     }
 
     @Override
     public String toString() {
-        return "ImageURL{" +
+        return "Tag{" +
                 "id=" + id +
-                ", url='" + url + '\'' +
+                ", label='" + label + '\'' +
                 ", pasteId='" + pasteId + '\'' +
                 '}';
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(url);
+        dest.writeString(label);
         dest.writeString(pasteId);
     }
 
@@ -75,12 +72,12 @@ public class ImageURL implements Parcelable {
         this.id = id;
     }
 
-    public String getUrl() {
-        return this.url;
+    public String getLabel() {
+        return this.label;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public String getPasteId() {
