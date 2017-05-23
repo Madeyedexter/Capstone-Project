@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.paste_it.R;
 import app.paste_it.models.ImageModel;
 
 /**
@@ -35,8 +36,8 @@ public class PreviewImageAdapter extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ImageView imageView = new ImageView(parent.getContext());
-        return new RecyclerView.ViewHolder(imageView) {};
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image_preview,parent,false);
+        return new RecyclerView.ViewHolder(view) {};
     }
 
     @Override

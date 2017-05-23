@@ -225,7 +225,11 @@ public class MainFragment extends Fragment implements View.OnClickListener,
         switch (item.getItemId()){
             case R.id.miSearch: addSearchFragment();
                 return true;
-            case R.id.miLogOut: FirebaseAuth.getInstance().signOut();
+            case R.id.miLogOut:
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(getActivity(),LoginActivity.class));
+                getActivity().finish();
+                return true;
             default:return super.onOptionsItemSelected(item);
         }
 
@@ -256,7 +260,10 @@ public class MainFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.fabNewPaste: startActivity(new Intent(getActivity(),PasteItActivity.class));
+            case R.id.fabNewPaste:
+                Intent intent = new Intent(getContext(),PasteItActivity.class);
+                intent.putExtra(getString(R.string.key_paste),new Paste());
+                startActivity(intent);
                 break;
         }
     }

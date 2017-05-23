@@ -26,4 +26,8 @@
     <string name="key_image_models">image_models</string>
     <string name="key_image_model_updated">image_model_updated</string>
     <string name="key_dload_uri_available">key_dload_uri_available</string>
+    <string name="key_ll_os">key_ll_os</string>
+    <string name="choose_tags">Choose Tags</string>
+    <string name="confirm_delete">Confirm Delete</string>
+    <string name="confirm_dialog_message">Deleting this tag will remove it from all your content. Proceed ?</string>
 </resources>

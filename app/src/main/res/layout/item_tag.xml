@@ -13,19 +13,27 @@
         android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
         android:layout_centerVertical="true"
-        android:layout_margin="@dimen/padding_text"
-        android:background="?selectableItemBackground"
+        android:background="?selectableItemBackgroundBorderless"
         android:src="@drawable/ic_close_black_24dp" />
 
     <android.support.v7.widget.AppCompatCheckedTextView
+        android:id="@+id/acctTagName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/ibDeleteTag"
         android:layout_toRightOf="@+id/ibDeleteTag"
         android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-        android:checked="true"
-        android:gravity="center"
+        android:background="?selectableItemBackground"
+        android:checked="false"
         android:padding="@dimen/padding_text"
+        android:layout_margin="16dp"
+        android:gravity="center"
         tools:text="Tag 1" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dividerGrey"
+        android:layout_alignParentBottom="true"
+        />
 </RelativeLayout>

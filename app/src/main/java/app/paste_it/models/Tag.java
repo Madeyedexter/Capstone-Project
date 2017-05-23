@@ -10,7 +10,6 @@ import org.greenrobot.greendao.annotation.Generated;
 /**
  * Created by Madeyedexter on 13-05-2017.
  */
-@Entity
 public class Tag implements Parcelable {
     public static final Creator<Tag> CREATOR = new Creator<Tag>() {
         @Override
@@ -23,26 +22,17 @@ public class Tag implements Parcelable {
             return new Tag[size];
         }
     };
-    @Id(autoincrement = true)
-    private Long id;
+    private String id;
     private String label;
     private String pasteId;
 
     protected Tag(Parcel in) {
+        id = in.readString();
         label = in.readString();
         pasteId = in.readString();
     }
 
-    @Generated(hash = 1997334013)
-    public Tag(Long id, String label, String pasteId) {
-        this.id = id;
-        this.label = label;
-        this.pasteId = pasteId;
-    }
-
-    @Generated(hash = 1605720318)
-    public Tag() {
-    }
+    public Tag(){}
 
     @Override
     public String toString() {
@@ -55,6 +45,7 @@ public class Tag implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
         dest.writeString(label);
         dest.writeString(pasteId);
     }
@@ -64,11 +55,11 @@ public class Tag implements Parcelable {
         return 0;
     }
 
-    public Long getId() {
+    public String getId() {
         return this.id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
