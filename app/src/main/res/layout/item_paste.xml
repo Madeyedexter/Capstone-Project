@@ -43,12 +43,13 @@
             android:layout_height="1dp"
             android:background="@color/dividerGrey"
             />
-        <LinearLayout
-            android:id="@+id/llTagViewGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-        </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llTagViewGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 

@@ -25,6 +25,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -73,6 +74,7 @@ public class MainFragment extends Fragment implements View.OnClickListener,
     FloatingActionButton fabNewPaste;
     @BindView(R.id.srLayout)
     SwipeRefreshLayout srLayout;
+
 
     private List<ImageModel> imageModels;
 
@@ -261,12 +263,17 @@ public class MainFragment extends Fragment implements View.OnClickListener,
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.fabNewPaste:
-                Intent intent = new Intent(getContext(),PasteItActivity.class);
-                intent.putExtra(getString(R.string.key_paste),new Paste());
-                startActivity(intent);
+                startPasteItActivity(new Paste());
                 break;
         }
     }
+
+    private void startPasteItActivity(Paste paste) {
+        Intent intent = new Intent(getContext(),PasteItActivity.class);
+        intent.putExtra(getString(R.string.key_paste),paste);
+        startActivity(intent);
+    }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -275,7 +282,8 @@ public class MainFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onThumbClicked(Paste paste) {
-
+        Log.d(TAG,"Card Clicked");
+        startPasteItActivity(paste);
     }
 
     @Override

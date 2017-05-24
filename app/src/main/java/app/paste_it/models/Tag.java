@@ -3,6 +3,8 @@ package app.paste_it.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.database.Exclude;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
@@ -11,6 +13,43 @@ import org.greenrobot.greendao.annotation.Generated;
  * Created by Madeyedexter on 13-05-2017.
  */
 public class Tag implements Parcelable {
+    private String id;
+    private String label;
+    private String pasteId;
+    @Exclude
+    private boolean selected;
+
+    public Tag(){}
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    protected Tag(Parcel in) {
+        id = in.readString();
+
+        label = in.readString();
+        pasteId = in.readString();
+        selected = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(label);
+        dest.writeString(pasteId);
+        dest.writeByte((byte) (selected ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
     public static final Creator<Tag> CREATOR = new Creator<Tag>() {
         @Override
         public Tag createFromParcel(Parcel in) {
@@ -22,17 +61,6 @@ public class Tag implements Parcelable {
             return new Tag[size];
         }
     };
-    private String id;
-    private String label;
-    private String pasteId;
-
-    protected Tag(Parcel in) {
-        id = in.readString();
-        label = in.readString();
-        pasteId = in.readString();
-    }
-
-    public Tag(){}
 
     @Override
     public String toString() {
@@ -40,19 +68,8 @@ public class Tag implements Parcelable {
                 "id=" + id +
                 ", label='" + label + '\'' +
                 ", pasteId='" + pasteId + '\'' +
+                ", selected='" + selected + '\'' +
                 '}';
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(label);
-        dest.writeString(pasteId);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
     }
 
     public String getId() {

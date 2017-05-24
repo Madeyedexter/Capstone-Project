@@ -17,6 +17,7 @@ import app.paste_it.adapters.PasteAdapter;
 import app.paste_it.models.Identity;
 import app.paste_it.models.ImageModel;
 import app.paste_it.models.Paste;
+import app.paste_it.models.Tag;
 
 /**
  * Created by 834619 on 5/18/2017.
@@ -86,5 +87,14 @@ public class PasteUtils {
      * move to the first row in the Cursor, get the data,
      * and display it.
      */
+    }
+
+    public static int findIndexOfTag(List<Tag> tags, String id) {
+        if(tags!=null)
+            for(int i=0;i<tags.size();i++){
+                if(tags.get(i).getId().equals(id))
+                    return i;
+            }
+        return -1;
     }
 }

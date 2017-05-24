@@ -53,6 +53,16 @@
                 android:minLines="5"
                 android:textAppearance="?android:textAppearanceMedium"
                 />
+            <LinearLayout
+                android:id="@+id/llTagHolder"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_margin="16dp"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                >
+
+            </LinearLayout>
             <TextView
                 android:id="@+id/tvLastUpdated"
                 android:layout_width="match_parent"

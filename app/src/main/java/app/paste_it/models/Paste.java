@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,21 +15,27 @@ import java.util.Map;
  */
 public class Paste implements Parcelable {
     private String id;
-    private Long modified;
-    private Long created;
+    private long modified;
+    private long created;
     private String title;
     private String text;
-    private Map<String, ImageModel> urls = new HashMap<>();
+    private Map<String, ImageModel> urls = new LinkedHashMap<>();
     private boolean archived;
 
     public Paste(){}
 
     protected Paste(Parcel in) {
         id = in.readString();
+        modified = in.readLong();
+        created = in.readLong();
         title = in.readString();
         text = in.readString();
         archived = in.readByte() != 0;
-        tags = in.createTypedArrayList(Tag.CREATOR);
+        tags = new LinkedHashMap<>();
+        ArrayList<Tag> tagArrayList = in.createTypedArrayList(Tag.CREATOR);
+        for(Tag tag : tagArrayList){
+            tags.put(tag.getId(),tag);
+        }
         //LongSparseArray may be an alternative here
         urls = new HashMap<>();
         ArrayList<ImageModel> imageModelArrayList = in.createTypedArrayList(ImageModel.CREATOR);
@@ -40,10 +47,12 @@ public class Paste implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
+        dest.writeLong(modified);
+        dest.writeLong(created);
         dest.writeString(title);
         dest.writeString(text);
         dest.writeByte((byte) (archived ? 1 : 0));
-        dest.writeTypedList(tags);
+        dest.writeTypedList(new ArrayList<Parcelable>(tags.values()));
         dest.writeTypedList(new ArrayList<Parcelable>(urls.values()));
     }
 
@@ -86,7 +95,7 @@ public class Paste implements Parcelable {
                 '}';
     }
 
-    private List<Tag> tags;
+    private HashMap<String,Tag> tags = new HashMap<>();
 
     public String getId() {
         return id;
@@ -136,11 +145,11 @@ public class Paste implements Parcelable {
         this.urls = urls;
     }
 
-    public List<Tag> getTags() {
+    public HashMap<String,Tag> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(HashMap<String,Tag> tags) {
         this.tags = tags;
     }
 

@@ -75,8 +75,7 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.d(TAG,"Item Type is: "+viewType);
         switch(viewType){
-            case ITEM_TYPE_DATA: //default item
-                //Log.d(TAG,"Created MovieHolder");
+            case ITEM_TYPE_DATA:
                 return new PasteHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_paste,parent,false));
             case ITEM_TYPE_EMPTY: return new RecyclerView.ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_empty_image,parent,false)){};
             case ITEM_TYPE_LOADING: //Loading indicator
@@ -89,9 +88,16 @@ public class PasteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         switch (getItemViewType(position)){
-            case ITEM_TYPE_DATA: ((PasteHolder)holder).bindData(pastes.get(position));
+            case ITEM_TYPE_DATA:
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        clickListener.onThumbClicked(pastes.get(position));
+                    }
+                });
+                ((PasteHolder)holder).bindData(pastes.get(position));
                 break;
             case ITEM_TYPE_LOADING: break;
             //all others

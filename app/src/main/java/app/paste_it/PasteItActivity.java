@@ -25,7 +25,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
+import org.greenrobot.greendao.database.Database;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import app.paste_it.adapters.ImageAdapter;
 import app.paste_it.models.ImageModel;
@@ -44,6 +47,8 @@ public class PasteItActivity extends AppCompatActivity implements ConfirmDialogF
 
     private static final String TAG = PasteItActivity.class.getSimpleName();
 
+    private String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +59,7 @@ public class PasteItActivity extends AppCompatActivity implements ConfirmDialogF
         }
         if(savedInstanceState==null){
             PasteItFragment pasteItFragment = PasteItFragment.newInstance(paste);
-            getSupportFragmentManager().beginTransaction().add(R.id.frame,pasteItFragment).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.frame,pasteItFragment,getString(R.string.tag_pasteit_fragment)).commit();
         }
     }
 
@@ -65,11 +70,30 @@ public class PasteItActivity extends AppCompatActivity implements ConfirmDialogF
 
     @Override
     public void onYes(Tag tag) {
-
+        FirebaseDatabase.getInstance().getReference("tags").child(uid).child(tag.getId()).removeValue();
     }
 
     @Override
     public void onNo() {
         //do Nothing
+    }
+
+    @Override
+    public void onBackPressed() {
+        TagFragment tagFragment = (TagFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.tag_tag_fragment));
+        PasteItFragment pasteItFragment = (PasteItFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.tag_pasteit_fragment));
+        if(tagFragment!=null){
+            HashMap<String,Tag> tags = tagFragment.getTags();
+            if(pasteItFragment!=null){
+                Paste paste = pasteItFragment.getPaste();
+                paste.setTags(tags);
+                pasteItFragment.addTags();
+                //also save the tags
+                pasteItFragment.savePaste();
+                Log.d(TAG,"Tags are: "+tags);
+            }
+
+        }
+        super.onBackPressed();
     }
 }

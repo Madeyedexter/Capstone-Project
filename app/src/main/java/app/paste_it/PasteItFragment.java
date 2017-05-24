@@ -7,8 +7,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,7 +25,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -46,7 +51,7 @@ import butterknife.ButterKnife;
  * Use the {@link PasteItFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PasteItFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class PasteItFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener{
 
     private static final String TAG = PasteItFragment.class.getSimpleName();
 
@@ -63,7 +68,19 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
     EditText etContent;
     @BindView(R.id.tvLastUpdated)
     TextView tvLastUpdated;
+    @BindView(R.id.llTagHolder)
+    LinearLayout llTagHolder;
     private ImageAdapter imageAdapter;
+
+    public Paste getPaste() {
+        return paste;
+    }
+
+    public void setPaste(Paste paste) {
+        this.paste = paste;
+        savePaste();
+    }
+
     private Paste paste;
 
     @Override
@@ -118,7 +135,7 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
 
     private void showTagFragment() {
         TagFragment tagFragment = TagFragment.newInstance(paste);
-        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack("tags").add(R.id.frame, tagFragment).commit();
+        getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(getString(R.string.tag_tag_fragment)).add(R.id.frame, tagFragment, getString(R.string.tag_tag_fragment)).commit();
     }
 
     private void pickImage() {
@@ -155,11 +172,13 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         }
     }
 
-    private String savePaste() {
+    public String savePaste() {
         if(paste==null)
             paste =new Paste();
-        if(paste.getId()==null && etTitle.getText().length()==0 && etContent.getText().length()==0 && paste.getUrls().size()==0)
+        if(paste.getId()==null && etTitle.getText().length()==0 && etContent.getText().length()==0 && paste.getUrls().size()==0) {
+            Toast.makeText(getActivity().getApplicationContext(),"Nothing to save.",Toast.LENGTH_SHORT).show();
             return null;
+        }
         String title = etTitle.getText().toString();
         String content = etContent.getText().toString();
         if(paste.getCreated()==null)
@@ -179,9 +198,6 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
             id = paste.getId();
             newPasteRef = FirebaseDatabase.getInstance().getReference("pastes/" + UID).child(id);
         }
-        //do not save the pastes, they will be saved asynchronously later when the images are uploaded
-        ArrayList<Tag> tags = new ArrayList<>();
-        paste.setTags(tags);
         newPasteRef.setValue(paste);
         tvLastUpdated.setText("Changes Saved: "+paste.getModified());
         return id;
@@ -273,9 +289,34 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         }
         imageAdapter = new ImageAdapter(paste.getUrls().values());
         rvImages.setAdapter(imageAdapter);
+
+        etTitle.setText(paste.getTitle());
+        etContent.setText(paste.getText());
+        addTags();
+
+        llTagHolder.setOnClickListener(this);
+
+        tvLastUpdated.setText("Last Modified: "+ paste.getModified());
         return view;
     }
 
+    public void addTags() {
+        llTagHolder.removeAllViews();
+        for(Tag tag : paste.getTags().values()){
+            TextView textView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.item_textviw_tag,null);
+            textView.setText(tag.getLabel());
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(16,16,16,16);
+            textView.setLayoutParams(layoutParams);
+            llTagHolder.addView(textView);
+        }
+    }
 
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.llTagHolder: showTagFragment();
+        }
+    }
 }

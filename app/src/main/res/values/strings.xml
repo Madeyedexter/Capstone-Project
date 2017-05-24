@@ -30,4 +30,9 @@
     <string name="choose_tags">Choose Tags</string>
     <string name="confirm_delete">Confirm Delete</string>
     <string name="confirm_dialog_message">Deleting this tag will remove it from all your content. Proceed ?</string>
+    <string name="tag_tag_fragment">tag_tag_fragment</string>
+    <string name="tag_pasteit_fragment">TagAdapter tagAdapter = (TagAdapter)rvTags.getAdapter();</string>
+    <string name="error_message_nowhitespace">Whitespaces are not allowed.</string>
+    <string name="tag_fragment_confirmdeletedialog">ConfirmDeleteDialog</string>
+    <string name="key_tags">key_tags</string>
 </resources>

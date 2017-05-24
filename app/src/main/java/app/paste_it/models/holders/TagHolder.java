@@ -2,6 +2,7 @@ package app.paste_it.models.holders;
 
 import android.support.v7.widget.AppCompatCheckedTextView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -16,6 +17,8 @@ import butterknife.ButterKnife;
 
 public class TagHolder extends RecyclerView.ViewHolder {
 
+    private static final String TAG = TagHolder.class.getSimpleName();
+
     @BindView(R.id.acctTagName)
     AppCompatCheckedTextView acctTagName;
     @BindView(R.id.ibDeleteTag)
@@ -28,8 +31,10 @@ public class TagHolder extends RecyclerView.ViewHolder {
         ibDeleteTag.setOnClickListener(onClickListener);
     }
 
-    public void bindData(Tag tag){
+    public void bindData(int position,Tag tag){
         acctTagName.setText(tag.getLabel());
-        ibDeleteTag.setTag(tag.getId());
+        acctTagName.setChecked(tag.isSelected());
+        ibDeleteTag.setTag(position);
+        acctTagName.setTag(position);
     }
 }

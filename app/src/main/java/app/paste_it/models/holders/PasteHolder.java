@@ -4,6 +4,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -21,6 +22,7 @@ import app.paste_it.adapters.ImageAdapter;
 import app.paste_it.adapters.PreviewImageAdapter;
 import app.paste_it.models.ImageModel;
 import app.paste_it.models.Paste;
+import app.paste_it.models.Tag;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -83,9 +85,24 @@ public class PasteHolder extends RecyclerView.ViewHolder implements View.OnClick
 
         if(paste.getTags()== null || paste.getTags().size()==0){
             llTagsWrapper.setVisibility(View.GONE);
+            llTagViewGroup.removeAllViews();
         }
         else{
             llTagsWrapper.setVisibility(View.VISIBLE);
+            llTagViewGroup.removeAllViews();
+            int count=0;
+            for(Tag tag : paste.getTags().values()){
+                count++;
+                TextView textView = (TextView) LayoutInflater.from(rootCard.getContext()).inflate(R.layout.item_textviw_tag,null);
+                textView.setText(tag.getLabel());
+                llTagViewGroup.addView(textView);
+                if(count==3){
+                    int remaining = paste.getTags().size()-count+1;
+                    textView.setText("+ "+remaining);
+                    break;
+                }
+
+            }
         }
     }
 

@@ -1,10 +1,12 @@
 package app.paste_it.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import app.paste_it.R;
@@ -32,7 +34,7 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         this.onClickListener=onClickListener;
     }
 
-    private List<Tag> tags;
+    private List<Tag> tags = new ArrayList<>();
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -43,7 +45,8 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         TagHolder tagHolder = (TagHolder) holder;
-        tagHolder.bindData(tags.get(position));
+        Log.d(TAG,"Tag is: "+tags.get(position));
+        tagHolder.bindData(position, tags.get(position));
     }
 
     @Override
