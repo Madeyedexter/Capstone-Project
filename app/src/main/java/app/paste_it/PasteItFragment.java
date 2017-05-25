@@ -7,13 +7,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -23,13 +19,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.flexbox.AlignItems;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
@@ -37,8 +30,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
-
-import java.util.ArrayList;
 
 import app.paste_it.adapters.ImageAdapter;
 import app.paste_it.models.ImageModel;
@@ -62,6 +53,7 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
     private static final int RC_SELECT_PICTURE = 1;
     private static final int RC_CAPTURE_IMAGE = 2;
     private static final String UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    private static final String ARG_PARAM1 = "param1";
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.rvImages)
@@ -75,6 +67,27 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
     @BindView(R.id.llTagHolder)
     LinearLayout llTagHolder;
     private ImageAdapter imageAdapter;
+    private Paste paste;
+
+    public PasteItFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param paste The Paste being shown in this fragment
+     * @return A new instance of fragment PasteItFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static PasteItFragment newInstance(Paste paste) {
+        PasteItFragment fragment = new PasteItFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_PARAM1, paste);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     public Paste getPaste() {
         return paste;
@@ -85,8 +98,6 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         savePaste();
     }
 
-    private Paste paste;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +107,8 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         }
         PreferenceManager.getDefaultSharedPreferences(getContext()).registerOnSharedPreferenceChangeListener(this);
     }
+
+    //todo: parcel paste object
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -114,8 +127,6 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         super.onDestroy();
         PreferenceManager.getDefaultSharedPreferences(getContext()).unregisterOnSharedPreferenceChangeListener(this);
     }
-
-    //todo: parcel paste object
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -245,32 +256,6 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         }
     }
 
-
-
-
-
-    private static final String ARG_PARAM1 = "param1";
-
-    public PasteItFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param paste The Paste being shown in this fragment
-     * @return A new instance of fragment PasteItFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PasteItFragment newInstance(Paste paste) {
-        PasteItFragment fragment = new PasteItFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_PARAM1, paste);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -311,7 +296,7 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
     public void addTags() {
         llTagHolder.removeAllViews();
         for(Tag tag : paste.getTags().values()){
-            TextView textView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.item_textviw_tag,null);
+            TextView textView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.item_textview_tag, null);
             textView.setText(tag.getLabel());
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             layoutParams.setMargins(16,16,16,16);

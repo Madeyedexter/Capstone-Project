@@ -38,4 +38,6 @@
     <string name="error_message_tag_length">Tags must have a minimum length of 3 characters.</string>
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_closed">drawer_closed</string>
+    <string name="key_rvos">rvos</string>
+    <string name="paste_counts">$1%s Pastes, $2%s archived</string>
 </resources>

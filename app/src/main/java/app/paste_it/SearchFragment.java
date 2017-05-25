@@ -6,10 +6,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -24,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Filterable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -115,8 +111,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Pa
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                MainFragment mainFragment = MainFragment.newInstance();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame,mainFragment).commit();
                 return true;
             default:return super.onOptionsItemSelected(item);
         }
@@ -132,13 +126,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Pa
     public void onThumbClicked(Paste paste) {
         updateRecentSearch(paste);
         viewPaste(paste);
-
-
-
-
-
-
-
     }
 
     private void viewPaste(Paste paste) {

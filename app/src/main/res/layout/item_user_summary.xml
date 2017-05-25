@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:background="@color/colorPrimary">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="32dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/ivUserpic"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_face_grey_24dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+                tools:text="Roman Nurik" />
+
+            <TextView
+                android:id="@+id/tvPasteCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/paste_counts"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>
