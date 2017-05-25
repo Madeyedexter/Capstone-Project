@@ -29,6 +29,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.flexbox.AlignItems;
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -115,6 +119,7 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         switch (item.getItemId()) {
             case android.R.id.home:
                 savePaste();
@@ -175,13 +180,9 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
     public String savePaste() {
         if(paste==null)
             paste =new Paste();
-        if(paste.getId()==null && etTitle.getText().length()==0 && etContent.getText().length()==0 && paste.getUrls().size()==0) {
-            Toast.makeText(getActivity().getApplicationContext(),"Nothing to save.",Toast.LENGTH_SHORT).show();
-            return null;
-        }
         String title = etTitle.getText().toString();
         String content = etContent.getText().toString();
-        if(paste.getCreated()==null)
+        if(paste.getCreated()==0)
             paste.setCreated(System.currentTimeMillis());
         paste.setModified(System.currentTimeMillis());
         paste.setTitle(title);
@@ -199,7 +200,11 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
             newPasteRef = FirebaseDatabase.getInstance().getReference("pastes/" + UID).child(id);
         }
         newPasteRef.setValue(paste);
+
+        if(paste.getModified()!=0){
+            tvLastUpdated.setVisibility(View.VISIBLE);
         tvLastUpdated.setText("Changes Saved: "+paste.getModified());
+        }
         return id;
     }
 
@@ -278,14 +283,15 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         setHasOptionsMenu(true);
 
         appCompatActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,true);
-        rvImages.setLayoutManager(linearLayoutManager);
+
+        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(FlexDirection.ROW, JustifyContent.FLEX_END);
+        rvImages.setLayoutManager(flexboxLayoutManager);
 
         //when fragment is recreated
         if(savedInstanceState!=null){
             paste = savedInstanceState.getParcelable(getString(R.string.key_paste));
             Parcelable lloS = savedInstanceState.getParcelable(getString(R.string.key_ll_os));
-            linearLayoutManager.onRestoreInstanceState(lloS);
+            flexboxLayoutManager.onRestoreInstanceState(lloS);
         }
         imageAdapter = new ImageAdapter(paste.getUrls().values());
         rvImages.setAdapter(imageAdapter);
@@ -295,8 +301,10 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         addTags();
 
         llTagHolder.setOnClickListener(this);
-
-        tvLastUpdated.setText("Last Modified: "+ paste.getModified());
+        if(paste.getModified()!=0){
+            tvLastUpdated.setVisibility(View.VISIBLE);
+            tvLastUpdated.setText("Last Modified: "+ paste.getModified());
+        }
         return view;
     }
 

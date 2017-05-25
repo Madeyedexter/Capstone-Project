@@ -46,7 +46,11 @@
                 android:id="@+id/etContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_viewport"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="@dimen/margin_viewport"
+                android:layout_marginRight="@dimen/margin_viewport"
+                android:layout_marginStart="@dimen/margin_viewport"
+                android:layout_marginLeft="@dimen/margin_viewport"
                 android:background="@null"
                 android:gravity="top"
                 android:hint="Enter text here"
@@ -60,8 +64,8 @@
                 android:layout_margin="16dp"
                 android:layout_height="wrap_content"
                 android:clickable="true"
+                android:background="?selectableItemBackground"
                 >
-
             </LinearLayout>
             <TextView
                 android:id="@+id/tvLastUpdated"
@@ -69,7 +73,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/padding_text"
                 android:gravity="center"
-                android:textAppearance="@style/TextAppearance.AppCompat"
+                android:visibility="gone"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                 />
         </LinearLayout>
     </ScrollView>

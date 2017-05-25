@@ -4,6 +4,8 @@
     android:layout_width="match_parent" android:layout_height="wrap_content"
     android:layout_margin="4dp"
     android:minHeight="64dp"
+    android:clickable="true"
+    android:focusable="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:foreground="?selectableItemBackground"
     >
@@ -23,14 +25,14 @@
             android:layout_height="wrap_content"
             tools:text="A night at the museum"
             android:padding="@dimen/padding_text"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
             />
         <TextView
             android:id="@+id/tvContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_text"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
             tools:text="A Nice Walk in the park enjoyed a lot"
             />
         <LinearLayout

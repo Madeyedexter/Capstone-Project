@@ -35,4 +35,7 @@
     <string name="error_message_nowhitespace">Whitespaces are not allowed.</string>
     <string name="tag_fragment_confirmdeletedialog">ConfirmDeleteDialog</string>
     <string name="key_tags">key_tags</string>
+    <string name="error_message_tag_length">Tags must have a minimum length of 3 characters.</string>
+    <string name="drawer_open">drawer_open</string>
+    <string name="drawer_closed">drawer_closed</string>
 </resources>

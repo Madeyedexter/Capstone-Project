@@ -66,12 +66,8 @@ public class MainFragment extends Fragment implements View.OnClickListener,
     private static final int ID_PASTE_REFRESH_LOADER = 1;
 
     //views
-    @BindView(R.id.toolbar)
-    Toolbar mToolbar;
     @BindView(R.id.rvPaste)
     RecyclerView rvPaste;
-    @BindView(R.id.fabNewPaste)
-    FloatingActionButton fabNewPaste;
     @BindView(R.id.srLayout)
     SwipeRefreshLayout srLayout;
 
@@ -187,11 +183,12 @@ public class MainFragment extends Fragment implements View.OnClickListener,
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this,view);
         AppCompatActivity activity = ((AppCompatActivity)getActivity());
-        activity.setSupportActionBar(mToolbar);
-        activity.setTitle("Paste It!");
+
+        //activity.getSupportActionBar().setIcon(R.drawable.ic_menu_white_24dp);
         setHasOptionsMenu(true);
 
-        fabNewPaste.setOnClickListener(this);
+        activity.setTitle("Paste It!");
+//        fabNewPaste.setOnClickListener(this);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(Utils.calculateNoOfColumns(getContext()), StaggeredGridLayoutManager.VERTICAL);
 
         srLayout.setOnRefreshListener(this);
@@ -260,12 +257,12 @@ public class MainFragment extends Fragment implements View.OnClickListener,
 
 
     @Override
-    public void onClick(View v) {
+    public void onClick(View v) {/*
         switch (v.getId()){
             case R.id.fabNewPaste:
                 startPasteItActivity(new Paste());
                 break;
-        }
+        }*/
     }
 
     private void startPasteItActivity(Paste paste) {

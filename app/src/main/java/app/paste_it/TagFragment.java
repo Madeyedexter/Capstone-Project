@@ -167,7 +167,13 @@ public class TagFragment extends Fragment implements View.OnClickListener {
             case R.id.ibDeleteTag:
                 showDeletTagConfirmDialog(v);
                 break;
-            case R.id.ibAddTag: addTag();
+            case R.id.ibAddTag:
+                v.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        addTag();
+                    }
+                },100);
                 break;
         }
     }
@@ -194,6 +200,10 @@ public class TagFragment extends Fragment implements View.OnClickListener {
     private void addTag() {
         if(etAddTag.getText().toString().contains(" ")){
             etAddTag.setError(getString(R.string.error_message_nowhitespace));
+            return;
+        }
+        if(etAddTag.getText().length() < 3){
+            etAddTag.setError(getString(R.string.error_message_tag_length));
             return;
         }
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
