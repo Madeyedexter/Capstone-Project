@@ -45,7 +45,6 @@ public class PreviewImageAdapter extends RecyclerView.Adapter {
         ImageView imageView = (ImageView)holder.itemView;
         String path = imageView.getContext().getFilesDir().getPath()+"/"+models.get(position).getFileName();
         File file = new File(path);
-        Log.d(TAG,"File exists: "+file.exists());
         Picasso.with(imageView.getContext()).load(file).into(imageView);
     }
 

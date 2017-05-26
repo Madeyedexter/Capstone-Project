@@ -31,6 +31,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
+import org.ocpsoft.prettytime.PrettyTime;
+
+import java.util.Date;
+import java.util.Locale;
+
 import app.paste_it.adapters.ImageAdapter;
 import app.paste_it.models.ImageModel;
 import app.paste_it.models.Paste;
@@ -213,8 +218,9 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         newPasteRef.setValue(paste);
 
         if(paste.getModified()!=0){
+
             tvLastUpdated.setVisibility(View.VISIBLE);
-        tvLastUpdated.setText("Changes Saved: "+paste.getModified());
+        tvLastUpdated.setText("Changes Saved: "+PasteUtils.getAgoString(paste.getModified()));
         }
         return id;
     }
@@ -288,10 +294,12 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         llTagHolder.setOnClickListener(this);
         if(paste.getModified()!=0){
             tvLastUpdated.setVisibility(View.VISIBLE);
-            tvLastUpdated.setText("Last Modified: "+ paste.getModified());
+            tvLastUpdated.setText("Last Modified: "+ PasteUtils.getAgoString(paste.getModified()));
         }
         return view;
     }
+
+
 
     public void addTags() {
         llTagHolder.removeAllViews();

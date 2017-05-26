@@ -1,5 +1,6 @@
 package app.paste_it;
 
+import android.app.SearchManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -7,22 +8,27 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -38,11 +44,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import app.paste_it.adapters.DrawerAdapter;
 import app.paste_it.adapters.PasteAdapter;
 import app.paste_it.models.DaoSession;
 import app.paste_it.models.ImageModel;
 import app.paste_it.models.ImageModelDao;
 import app.paste_it.models.Paste;
+import app.paste_it.models.Tag;
 import app.paste_it.service.ImageUploadService;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,16 +65,54 @@ public class MainActivity extends AppCompatActivity implements
     private static final int ID_PASTE_REFRESH_LOADER = 1;
 
     //views
-    @BindView(R.id.rvPaste)
-    RecyclerView rvPaste;
-    @BindView(R.id.srLayout)
-    SwipeRefreshLayout srLayout;
+
     @BindView(R.id.drawer_layout)
     DrawerLayout drawerLayout;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.sv)
-    SearchView searchView;
+
+    @BindView(R.id.rvLeftDrawer)
+    RecyclerView rvLeftDrawer;
+
+    private DatabaseReference userTagsDbReference = FirebaseDatabase.getInstance().getReference("tags").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    private ChildEventListener userTagsChildEventListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            Tag tag = dataSnapshot.getValue(Tag.class);
+            DrawerAdapter drawerAdapter = (DrawerAdapter)rvLeftDrawer.getAdapter();
+            drawerAdapter.getItems().add(tag);
+            drawerAdapter.notifyItemInserted(drawerAdapter.getItemCount()-1);
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            Tag tag = dataSnapshot.getValue(Tag.class);
+            DrawerAdapter drawerAdapter = (DrawerAdapter)rvLeftDrawer.getAdapter();
+            int index = PasteUtils.findIndexOfItemWithId(drawerAdapter.getItems(),tag.getId());
+            if(index>-1){
+                drawerAdapter.getItems().set(index,tag);
+                drawerAdapter.notifyItemChanged(index);
+            }
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+            Tag tag = dataSnapshot.getValue(Tag.class);
+            DrawerAdapter drawerAdapter = (DrawerAdapter)rvLeftDrawer.getAdapter();
+            int index = PasteUtils.findIndexOfItemWithId(drawerAdapter.getItems(),tag.getId());
+            drawerAdapter.getItems().remove(index);
+            drawerAdapter.notifyItemRemoved(index);
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+        }
+    };
+
     private List<ImageModel> imageModels;
     private DatabaseReference pasteReference = FirebaseDatabase.getInstance().getReference("pastes/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
     private ValueEventListener valueEventListener = new ValueEventListener() {
@@ -99,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements
             Log.d(TAG, "String: " + s + "\nAdded Snapshot: " + dataSnapshot);
             Paste paste = dataSnapshot.getValue(Paste.class);
             PasteUtils.resolvePaste(MainActivity.this, paste, (PasteAdapter) rvPaste.getAdapter());
+            srLayout.setRefreshing(false);
         }
 
         @Override
@@ -106,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements
             Log.d(TAG, "String: " + s + "\nChanged Snapshot: " + dataSnapshot);
             Paste paste = dataSnapshot.getValue(Paste.class);
             PasteUtils.resolvePaste(MainActivity.this, paste, (PasteAdapter) rvPaste.getAdapter());
+            srLayout.setRefreshing(false);
         }
 
         @Override
@@ -132,29 +180,49 @@ public class MainActivity extends AppCompatActivity implements
 
         ButterKnife.bind(this);
 
+        setSupportActionBar(toolbar);
+
         drawerLayout.addDrawerListener(this);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.drawer_open,R.string.drawer_closed);
         actionBarDrawerToggle.setDrawerSlideAnimationEnabled(true);
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
 
-        setTitle("Paste It!");
-//        fabNewPaste.setOnClickListener(this);
+
+
+
+
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(Utils.calculateNoOfColumns(this), StaggeredGridLayoutManager.VERTICAL);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
 
         srLayout.setOnRefreshListener(this);
+
+        String sectionText = getString(R.string.pastes);
+        int selectedPosition = 1;
         srLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
         if (savedInstanceState != null) {
             Parcelable rvos = savedInstanceState.getParcelable(getString(R.string.key_rvos));
+            Parcelable rvOsDrawer = savedInstanceState.getParcelable(getString(R.string.rvOsDrawer));
             staggeredGridLayoutManager.onRestoreInstanceState(rvos);
-            rvPaste.setLayoutManager(staggeredGridLayoutManager);
-            rvPaste.setAdapter(new PasteAdapter(this));
-        } else {
-            rvPaste.setLayoutManager(staggeredGridLayoutManager);
-            rvPaste.setAdapter(new PasteAdapter(this));
+            linearLayoutManager.onRestoreInstanceState(rvOsDrawer);
+            sectionText = savedInstanceState.getString(getString(R.string.key_section));
+            selectedPosition = savedInstanceState.getInt(getString(R.string.selection_postion));
         }
 
-        pasteReference.orderByKey().addListenerForSingleValueEvent(valueEventListener);
+        rvLeftDrawer.setLayoutManager(linearLayoutManager);
+        rvPaste.setLayoutManager(staggeredGridLayoutManager);
+
+        rvLeftDrawer.setAdapter(new DrawerAdapter(this));
+        rvPaste.setAdapter(new PasteAdapter(this));
+
+        ((DrawerAdapter)rvLeftDrawer.getAdapter()).setSelectionPosition(selectedPosition);
+
+        handleDrawerSectionSelection(sectionText);
+        //pasteReference.orderByKey().addListenerForSingleValueEvent(valueEventListener);
+        userTagsDbReference.addChildEventListener(userTagsChildEventListener);
+
         srLayout.setRefreshing(true);
+
+
 
         Utils.verifyStoragePermissions(this);
         Utils.verifyManageDocumentsPermissions(this);
@@ -165,14 +233,18 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main_activity, menu);
+        // Retrieve the SearchView and plug it into SearchManager
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.miSearch:
-                return true;
             case R.id.miLogOut:
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(this, LoginActivity.class));
@@ -197,25 +269,58 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onThumbClicked(Paste paste) {
-        startPasteItActivity(paste);
-    }
-
-    private void startPasteItActivity(Paste paste) {
-        Intent intent = new Intent(this, PasteItActivity.class);
-        intent.putExtra(getString(R.string.key_paste), paste);
-        startActivity(intent);
-    }
-
-    @Override
     public void onClick(View v) {
+        switch (v.getId()){
+            default:
 
+                int position = Integer.parseInt(v.getTag(R.string.selection_postion).toString());
+                DrawerAdapter drawerAdapter = ((DrawerAdapter)rvLeftDrawer.getAdapter());
+                if(drawerAdapter.getItemViewType(position) == DrawerAdapter.VIEW_TYPE_SECTION)
+                drawerAdapter.setSelectionPosition(position);
+                String text = ((TextView)v.findViewById(R.id.tvSectionText)).getText().toString();
+
+                handleDrawerSectionSelection(text);
+                drawerAdapter.notifyDataSetChanged();
+
+        }
+    }
+
+    private void handleDrawerSectionSelection(String sectionText) {
+        drawerLayout.closeDrawer(Gravity.START,true);
+        if(sectionText.equals(getString(R.string.pastes))){
+            setTitle(sectionText);
+            fabNewPaste.show();
+        }
+        else if(sectionText.equals(getString(R.string.archived))){
+            setTitle(sectionText);
+            fabNewPaste.hide();
+
+        }
+        else if(sectionText.equals(getString(R.string.settings))){
+            launchSettingsActivity();
+        }
+        else if(sectionText.equals(getString(R.string.about))){
+            launchAboutActivity();
+        }
+        else {
+            setTitle(sectionText);
+            fabNewPaste.show();
+        }
+
+    }
+
+    private void launchAboutActivity() {
+        //TODO: Launch About Activity
+    }
+
+    private void launchSettingsActivity() {
+        //TODO: Launch settings activity
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Parcelable rvos = rvPaste.getLayoutManager().onSaveInstanceState();
-        outState.putParcelable(getString(R.string.key_rvos), rvos);
+        outState.putParcelable(getString(R.string.rvOsDrawer),rvLeftDrawer.getLayoutManager().onSaveInstanceState());
+        outState.putInt(getString(R.string.selection_postion),((DrawerAdapter)rvLeftDrawer.getAdapter()).getSelectionPosition());
         super.onSaveInstanceState(outState);
     }
 
@@ -290,12 +395,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void onRefresh() {
-        srLayout.setRefreshing(true);
-        pasteReference.addListenerForSingleValueEvent(valueEventListener);
 
-    }
 
     @Override
     public Loader<List<ImageModel>> onCreateLoader(int id, Bundle args) {
@@ -343,7 +443,8 @@ public class MainActivity extends AppCompatActivity implements
     public void onStop() {
         super.onStop();
         pasteReference.removeEventListener(childEventListener);
-        pasteReference.removeEventListener(valueEventListener);
+        //pasteReference.removeEventListener(valueEventListener);
+        pasteReference.removeEventListener(childEventListener);
         getSupportLoaderManager().destroyLoader(ID_IMODEL_LOADER);
     }
 

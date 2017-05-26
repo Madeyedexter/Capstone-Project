@@ -85,7 +85,7 @@ public class PasteHolder extends RecyclerView.ViewHolder implements View.OnClick
             int count=0;
             for(Tag tag : paste.getTags().values()){
                 count++;
-                TextView textView = (TextView) LayoutInflater.from(rootCard.getContext()).inflate(R.layout.item_textview_tag, null);
+                TextView textView = (TextView) LayoutInflater.from(rootCard.getContext()).inflate(R.layout.item_textview_tag, llTagViewGroup, false);
                 textView.setText(tag.getLabel());
                 llTagViewGroup.addView(textView);
                 if(count==3){

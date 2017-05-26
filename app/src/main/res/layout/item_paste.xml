@@ -39,18 +39,15 @@
             android:id="@+id/llTagsWrapper"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/dividerGrey"
-            />
-
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            >
             <LinearLayout
                 android:id="@+id/llTagViewGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_margin="8dp">
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

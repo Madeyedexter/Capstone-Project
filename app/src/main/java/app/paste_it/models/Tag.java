@@ -12,7 +12,7 @@ import org.greenrobot.greendao.annotation.Generated;
 /**
  * Created by Madeyedexter on 13-05-2017.
  */
-public class Tag implements Parcelable {
+public class Tag implements Parcelable, Identity {
     private String id;
     private String label;
     private String pasteId;
@@ -71,7 +71,7 @@ public class Tag implements Parcelable {
                 ", selected='" + selected + '\'' +
                 '}';
     }
-
+    @Override
     public String getId() {
         return this.id;
     }

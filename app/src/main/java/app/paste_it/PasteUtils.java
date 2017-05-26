@@ -6,11 +6,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.OpenableColumns;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 
+import org.ocpsoft.prettytime.PrettyTime;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import app.paste_it.adapters.PasteAdapter;
@@ -76,6 +81,14 @@ public class PasteUtils {
         return -1;
     }
 
+    public static int findIndexOfItemWithId(@NonNull List<? extends Identity> list, String id){
+            for(int i=0;i<list.size();i++){
+                if(list.get(i).getId().equals(id))
+                    return i;
+            }
+        return -1;
+    }
+
     public static String getFileName(Context ccontext, Uri uri){
         Cursor cursor = ccontext.getContentResolver().query(uri,null,null,null,null);
         int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
@@ -96,5 +109,10 @@ public class PasteUtils {
                     return i;
             }
         return -1;
+    }
+
+    public static String getAgoString(Long modified) {
+        PrettyTime prettyTime = new PrettyTime(Locale.getDefault());
+        return prettyTime.format(new Date(modified));
     }
 }

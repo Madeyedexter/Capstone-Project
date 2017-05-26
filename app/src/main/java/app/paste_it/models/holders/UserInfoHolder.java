@@ -12,6 +12,7 @@ import com.squareup.picasso.Picasso;
 import app.paste_it.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by 834619 on 5/25/2017.
@@ -21,7 +22,7 @@ public class UserInfoHolder extends RecyclerView.ViewHolder {
 
     FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     @BindView(R.id.ivUserpic)
-    ImageView ivUserpic;
+    CircleImageView ivUserpic;
     @BindView(R.id.tvUsername)
     TextView tvUsername;
     @BindView(R.id.tvPasteCount)

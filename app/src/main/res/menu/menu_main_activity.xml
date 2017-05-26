@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/miSearch"
-        android:icon="@drawable/ic_search_white_24dp"
+    <item android:id="@+id/action_search"
         android:title="Search"
-        app:showAsAction="always" />
+        android:icon="@drawable/ic_search_white_24dp"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
 
     <item
         android:id="@+id/miSettings"
@@ -15,4 +16,5 @@
     <item android:id="@+id/miLogOut"
         android:title="Sign Out"
         app:showAsAction="never"/>
+
 </menu>
