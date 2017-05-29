@@ -4,6 +4,7 @@ package app.paste_it;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
@@ -31,11 +32,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
-import org.ocpsoft.prettytime.PrettyTime;
-
-import java.util.Date;
-import java.util.Locale;
-
 import app.paste_it.adapters.ImageAdapter;
 import app.paste_it.models.ImageModel;
 import app.paste_it.models.Paste;
@@ -51,7 +47,7 @@ import butterknife.ButterKnife;
  * Use the {@link PasteItFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PasteItFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener{
+public class PasteItFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener {
 
     private static final String TAG = PasteItFragment.class.getSimpleName();
 
@@ -107,7 +103,7 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //when fragment is first launched
-        if(getArguments()!=null){
+        if (getArguments() != null) {
             paste = getArguments().getParcelable(ARG_PARAM1);
         }
         PreferenceManager.getDefaultSharedPreferences(getContext()).registerOnSharedPreferenceChangeListener(this);
@@ -117,8 +113,8 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(getString(R.string.key_paste),paste);
-        outState.putParcelable(getString(R.string.key_ll_os),rvImages.getLayoutManager().onSaveInstanceState());
+        outState.putParcelable(getString(R.string.key_paste), paste);
+        outState.putParcelable(getString(R.string.key_ll_os), rvImages.getLayoutManager().onSaveInstanceState());
         super.onSaveInstanceState(outState);
     }
 
@@ -141,17 +137,25 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
                 savePaste();
                 NavUtils.navigateUpFromSameTask(getActivity());
                 break;
-            case R.id.miAttachImageFromCamera: //TODO: launch camera activity
+            case R.id.miAttachImageFromCamera:
+                launchCameraActivity();
                 break;
             case R.id.miAttachImageFromFile:
                 pickImage();
                 break;
-            case R.id.miTag: showTagFragment();
+            case R.id.miTag:
+                showTagFragment();
 
             default:
                 super.onOptionsItemSelected(item);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void launchCameraActivity() {
+        Utils.verifyStoragePermissions(getActivity());
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent,RC_CAPTURE_IMAGE);
     }
 
     private void showTagFragment() {
@@ -171,34 +175,40 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
-            switch (requestCode) {
-                case RC_SELECT_PICTURE:
-                    //paste id
-                    String pasteId = savePaste();
-                    //image model id
-                    String id = String.valueOf(System.currentTimeMillis());
-                    ImageModel imageModel = new ImageModel();
-                    imageModel.setId(id);
-                    imageModel.setPasteId(pasteId);
-                    paste.getUrls().put(imageModel.getId(),imageModel);
-                    ImageImportService.startActionImport(getContext(),data.getData(),imageModel);
-                    //TODO: retrieve image meta data and display image preview, after the image is imported
-                    imageAdapter.addItem(imageModel);
 
-                    break;
-                case RC_CAPTURE_IMAGE:
-                    break;
+
+        if (resultCode == Activity.RESULT_OK && data != null) {
+
+            if (requestCode == RC_SELECT_PICTURE || requestCode == RC_CAPTURE_IMAGE) {
+                String pasteId = savePaste();
+                String id = String.valueOf(System.currentTimeMillis());
+                ImageModel imageModel = new ImageModel();
+                imageModel.setId(id);
+                imageModel.setPasteId(pasteId);
+                if (requestCode == RC_SELECT_PICTURE && data.getData()!=null) {
+                    imageModel.setFileName(id + "_" + PasteUtils.getFileName(getContext(), data.getData()));
+                    paste.getUrls().put(imageModel.getId(), imageModel);
+                    ImageImportService.startActionImport(getContext(), data.getData(), imageModel);
+                    imageAdapter.addItem(imageModel);
+                }
+                if (requestCode == RC_CAPTURE_IMAGE) {
+                    Log.d(TAG,"RESCODE: "+ resultCode+" REQCODE: "+requestCode + " Data: "+data.getExtras().get("data"));
+                    Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                    imageModel.setFileName(id+"_Camera_Capture.png");
+                    paste.getUrls().put(imageModel.getId(),imageModel);
+                    ImageImportService.startActionImportPicture(getContext(),bitmap,imageModel);
+                    imageAdapter.addItem(imageModel);
+                }
             }
         }
     }
 
     public String savePaste() {
-        if(paste==null)
-            paste =new Paste();
+        if (paste == null)
+            paste = new Paste();
         String title = etTitle.getText().toString();
         String content = etContent.getText().toString();
-        if(paste.getCreated()==0)
+        if (paste.getCreated() == 0)
             paste.setCreated(System.currentTimeMillis());
         paste.setModified(System.currentTimeMillis());
         paste.setTitle(title);
@@ -206,51 +216,50 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
 
         String id = null;
         DatabaseReference newPasteRef = null;
-        if(paste.getId()==null) {
+        if (paste.getId() == null) {
             newPasteRef = FirebaseDatabase.getInstance().getReference("pastes/" + UID).push();
             id = newPasteRef.getKey();
             paste.setId(id);
-        }
-        else {
+        } else {
             id = paste.getId();
             newPasteRef = FirebaseDatabase.getInstance().getReference("pastes/" + UID).child(id);
         }
         newPasteRef.setValue(paste);
 
-        if(paste.getModified()!=0){
+        if (paste.getModified() != 0) {
 
             tvLastUpdated.setVisibility(View.VISIBLE);
-        tvLastUpdated.setText("Changes Saved: "+PasteUtils.getAgoString(paste.getModified()));
+            tvLastUpdated.setText("Changes Saved: " + PasteUtils.getAgoString(paste.getModified()));
         }
         return id;
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Log.d(TAG,"Preferences changed with key: "+key);
+        Log.d(TAG, "Preferences changed with key: " + key);
         //if we are still here, the user has imported the images and doing some other task
         //The images have been loaded locally, but not yet uploaded to the cloud
         Gson gson = new Gson();
-        if(key.equals(getString(R.string.key_image_model_updated))){
-            String jsonString = sharedPreferences.getString(key,"");
-            ImageModel imageModel = gson.fromJson(jsonString,ImageModel.class);
-            paste.getUrls().put(imageModel.getId(),imageModel);
-            int index = PasteUtils.findIndex(imageAdapter.getItems(),imageModel);
-            Log.d(TAG,"Index is: "+index);
-            Log.d(TAG,"Items in Adapter are: "+imageAdapter.getItems());
-            if(index > -1){
-                imageAdapter.getItems().set(index,imageModel);
+        if (key.equals(getString(R.string.key_image_model_updated))) {
+            String jsonString = sharedPreferences.getString(key, "");
+            ImageModel imageModel = gson.fromJson(jsonString, ImageModel.class);
+            paste.getUrls().put(imageModel.getId(), imageModel);
+            int index = PasteUtils.findIndex(imageAdapter.getItems(), imageModel);
+            Log.d(TAG, "Index is: " + index);
+            Log.d(TAG, "Items in Adapter are: " + imageAdapter.getItems());
+            if (index > -1) {
+                imageAdapter.getItems().set(index, imageModel);
                 imageAdapter.notifyDataSetChanged();
             }
             //start the image upload service
-            Intent intent  = new Intent(getContext(), ImageUploadService.class);
+            Intent intent = new Intent(getContext(), ImageUploadService.class);
             intent.setAction(ImageUploadService.ACTION_IMAGE_UPLOAD);
             getContext().startService(intent);
         }
-        if(key.equals(getString(R.string.key_dload_uri_available))){
-            String jsonString = sharedPreferences.getString(key,"");
-            ImageModel imageModel = gson.fromJson(jsonString,ImageModel.class);
-            if(imageModel.getPasteId().equals(paste.getId())) {
+        if (key.equals(getString(R.string.key_dload_uri_available))) {
+            String jsonString = sharedPreferences.getString(key, "");
+            ImageModel imageModel = gson.fromJson(jsonString, ImageModel.class);
+            if (imageModel.getPasteId().equals(paste.getId())) {
                 paste.getUrls().put(imageModel.getId(), imageModel);
                 int index = PasteUtils.findIndex(imageAdapter.getItems(), imageModel);
                 Log.d(TAG, "Index is: " + index);
@@ -266,9 +275,9 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_paste_it, container, false);
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
 
-        AppCompatActivity appCompatActivity = (AppCompatActivity)getActivity();
+        AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
         appCompatActivity.setSupportActionBar(toolbar);
         appCompatActivity.setTitle(getString(R.string.paste_it));
         setHasOptionsMenu(true);
@@ -279,7 +288,7 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         rvImages.setLayoutManager(flexboxLayoutManager);
 
         //when fragment is recreated
-        if(savedInstanceState!=null){
+        if (savedInstanceState != null) {
             paste = savedInstanceState.getParcelable(getString(R.string.key_paste));
             Parcelable lloS = savedInstanceState.getParcelable(getString(R.string.key_ll_os));
             flexboxLayoutManager.onRestoreInstanceState(lloS);
@@ -292,22 +301,21 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         addTags();
 
         llTagHolder.setOnClickListener(this);
-        if(paste.getModified()!=0){
+        if (paste.getModified() != 0) {
             tvLastUpdated.setVisibility(View.VISIBLE);
-            tvLastUpdated.setText("Last Modified: "+ PasteUtils.getAgoString(paste.getModified()));
+            tvLastUpdated.setText("Last Modified: " + PasteUtils.getAgoString(paste.getModified()));
         }
         return view;
     }
 
 
-
     public void addTags() {
         llTagHolder.removeAllViews();
-        for(Tag tag : paste.getTags().values()){
+        for (Tag tag : paste.getTags().values()) {
             TextView textView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.item_textview_tag, null);
             textView.setText(tag.getLabel());
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            layoutParams.setMargins(16,16,16,16);
+            layoutParams.setMargins(16, 16, 16, 16);
             textView.setLayoutParams(layoutParams);
             llTagHolder.addView(textView);
         }
@@ -316,8 +324,9 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.llTagHolder: showTagFragment();
+        switch (v.getId()) {
+            case R.id.llTagHolder:
+                showTagFragment();
         }
     }
 }

@@ -14,7 +14,7 @@ import butterknife.ButterKnife;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DetailFragment extends Fragment implements View.OnClickListener{
+public class DetailFragment extends Fragment implements View.OnClickListener {
 
 
     private static final String ARG1 = "ARG1";
@@ -23,7 +23,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener{
         // Required empty public constructor
     }
 
-    public static DetailFragment newInstance(Paste paste){
+    public static DetailFragment newInstance(Paste paste) {
         DetailFragment detailFragment = new DetailFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(ARG1, paste);
@@ -43,7 +43,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
 
         }
 

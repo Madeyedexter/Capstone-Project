@@ -5,28 +5,28 @@ import android.os.Parcelable;
 
 import com.google.firebase.database.Exclude;
 
-import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.Generated;
-
 /**
  * Created by Madeyedexter on 13-05-2017.
  */
 public class Tag implements Parcelable, Identity {
+    public static final Creator<Tag> CREATOR = new Creator<Tag>() {
+        @Override
+        public Tag createFromParcel(Parcel in) {
+            return new Tag(in);
+        }
+
+        @Override
+        public Tag[] newArray(int size) {
+            return new Tag[size];
+        }
+    };
     private String id;
     private String label;
     private String pasteId;
     @Exclude
     private boolean selected;
 
-    public Tag(){}
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    public Tag() {
     }
 
     protected Tag(Parcel in) {
@@ -35,6 +35,14 @@ public class Tag implements Parcelable, Identity {
         label = in.readString();
         pasteId = in.readString();
         selected = in.readByte() != 0;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     @Override
@@ -50,18 +58,6 @@ public class Tag implements Parcelable, Identity {
         return 0;
     }
 
-    public static final Creator<Tag> CREATOR = new Creator<Tag>() {
-        @Override
-        public Tag createFromParcel(Parcel in) {
-            return new Tag(in);
-        }
-
-        @Override
-        public Tag[] newArray(int size) {
-            return new Tag[size];
-        }
-    };
-
     @Override
     public String toString() {
         return "Tag{" +
@@ -71,6 +67,7 @@ public class Tag implements Parcelable, Identity {
                 ", selected='" + selected + '\'' +
                 '}';
     }
+
     @Override
     public String getId() {
         return this.id;

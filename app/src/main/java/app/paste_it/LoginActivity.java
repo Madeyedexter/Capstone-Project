@@ -32,7 +32,7 @@ import butterknife.ButterKnife;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity implements OnClickListener, GoogleApiClient.OnConnectionFailedListener{
+public class LoginActivity extends AppCompatActivity implements OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -79,8 +79,9 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btnGooglePlus: signIn();
+        switch (v.getId()) {
+            case R.id.btnGooglePlus:
+                signIn();
                 break;
         }
 
@@ -93,8 +94,8 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(this,"Unable to access google APIs. Make sure you have google play services installed and it is working properly."
-        ,Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Unable to access google APIs. Make sure you have google play services installed and it is working properly."
+                , Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -109,15 +110,15 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
     }
 
     private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG,"Sign In result: "+ result.isSuccess());
+        Log.d(TAG, "Sign In result: " + result.isSuccess());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            Toast.makeText(this,"Signed in as: "+acct.getDisplayName(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Signed in as: " + acct.getDisplayName(), Toast.LENGTH_SHORT).show();
             firebaseAuthWithGoogle(acct);
         } else {
             // Signed out, show unauthenticated UI.
-            Toast.makeText(this,"Signed Out",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Signed Out", Toast.LENGTH_SHORT).show();
             updateUI(null);
         }
     }
@@ -138,7 +139,7 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                             updateUI(null);
                         }
                     }
@@ -146,14 +147,12 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
     }
 
     private void updateUI(FirebaseUser firebaseUser) {
-        if(firebaseUser!=null){
+        if (firebaseUser != null) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
         }
     }
-
-
 
 
 }

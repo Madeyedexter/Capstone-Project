@@ -3,20 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-    <item android:id="@+id/miAttach"
+    <item
+        android:id="@+id/miAttach"
         android:icon="@drawable/ic_attachment_white_24dp"
         android:title="Attach Images"
-        app:showAsAction="ifRoom"
-        >
+        app:showAsAction="ifRoom">
         <menu>
-            <item android:id="@+id/miAttachImageFromFile"
+            <item
+                android:id="@+id/miAttachImageFromFile"
                 android:icon="@drawable/ic_image_black_24dp"
-                android:title="Image from file"
-                />
-            <item android:id="@+id/miAttachImageFromCamera"
+                android:title="Image from file" />
+            <item
+                android:id="@+id/miAttachImageFromCamera"
                 android:icon="@drawable/ic_photo_camera_black_24dp"
-                android:title="Image from Camera"
-                />
+                android:title="Image from Camera" />
         </menu>
     </item>
     <item

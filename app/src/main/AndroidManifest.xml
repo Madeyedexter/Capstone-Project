@@ -35,7 +35,7 @@
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".PasteItActivity"
             android:launchMode="singleTop"
@@ -45,24 +45,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SearchActivity"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
-        </activity>
 
         <service
             android:name=".service.ImageUploadService"
             android:exported="false" />
         <service
             android:name=".service.ImageImportService"
-            android:exported="false"></service>
+            android:exported="false" />
+
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".ShareActivity" android:theme="@style/AppTheme.Transaparent">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

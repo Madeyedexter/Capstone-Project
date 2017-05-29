@@ -59,7 +59,6 @@ public final class Utils {
     }
 
 
-
     public static void closeKeyboard(Context c, IBinder windowToken) {
         InputMethodManager mgr = (InputMethodManager) c.getSystemService(Context.INPUT_METHOD_SERVICE);
         mgr.hideSoftInputFromWindow(windowToken, 0);

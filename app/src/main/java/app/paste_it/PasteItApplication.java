@@ -3,6 +3,7 @@ package app.paste_it;
 import android.app.Application;
 
 import com.google.firebase.database.FirebaseDatabase;
+
 import org.greenrobot.greendao.database.Database;
 
 import app.paste_it.models.DaoMaster;

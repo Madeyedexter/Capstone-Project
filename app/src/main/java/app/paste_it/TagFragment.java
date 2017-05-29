@@ -1,19 +1,12 @@
 package app.paste_it;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatCheckedTextView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -63,14 +56,15 @@ public class TagFragment extends Fragment implements View.OnClickListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
 
-            Log.d(TAG,"DataSnapshot is: "+dataSnapshot);
-            Map<String,Tag> map = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Tag>>() {});
-            if(map!=null && map.size()!=0){
-                TagAdapter tagAdapter = (TagAdapter)rvTags.getAdapter();
+            Log.d(TAG, "DataSnapshot is: " + dataSnapshot);
+            Map<String, Tag> map = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Tag>>() {
+            });
+            if (map != null && map.size() != 0) {
+                TagAdapter tagAdapter = (TagAdapter) rvTags.getAdapter();
                 List<Tag> tagList = new ArrayList<>(map.values());
                 Paste paste = getArguments().getParcelable(ARG_PASTE);
-                HashMap<String,Tag> pasteTags = paste.getTags();
-                for(Tag tag : tagList){
+                HashMap<String, Tag> pasteTags = paste.getTags();
+                for (Tag tag : tagList) {
                     tag.setSelected(pasteTags.containsKey(tag.getId()));
                 }
                 tagAdapter.setTags(tagList);
@@ -98,7 +92,7 @@ public class TagFragment extends Fragment implements View.OnClickListener {
         public void onChildRemoved(DataSnapshot dataSnapshot) {
             Tag tag = dataSnapshot.getValue(Tag.class);
             TagAdapter tagAdapter = (TagAdapter) rvTags.getAdapter();
-            int index = PasteUtils.findIndexOfTag(tagAdapter.getTags(),tag.getId());
+            int index = PasteUtils.findIndexOfTag(tagAdapter.getTags(), tag.getId());
             tagAdapter.getTags().remove(index);
             tagAdapter.notifyDataSetChanged();
         }
@@ -114,6 +108,14 @@ public class TagFragment extends Fragment implements View.OnClickListener {
         }
     };
 
+    public static TagFragment newInstance(Paste paste) {
+        TagFragment tagFragment = new TagFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_PASTE, paste);
+        tagFragment.setArguments(args);
+        return tagFragment;
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -125,14 +127,6 @@ public class TagFragment extends Fragment implements View.OnClickListener {
         super.onSaveInstanceState(outState);
     }
 
-    public static TagFragment newInstance(Paste paste) {
-        TagFragment tagFragment = new TagFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_PASTE, paste);
-        tagFragment.setArguments(args);
-        return tagFragment;
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -140,11 +134,11 @@ public class TagFragment extends Fragment implements View.OnClickListener {
         View rootView = inflater.inflate(R.layout.fragment__tag, container, false);
         ButterKnife.bind(this, rootView);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         rvTags.setLayoutManager(linearLayoutManager);
         TagAdapter tagAdapter = new TagAdapter(this);
 
-        Log.d(TAG,"After restore: "+tagAdapter.getTags());
+        Log.d(TAG, "After restore: " + tagAdapter.getTags());
         rvTags.setAdapter(tagAdapter);
 
         ibAddTag.setOnClickListener(this);
@@ -160,7 +154,7 @@ public class TagFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
 
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.acctTagName:
                 checkTag(v);
                 break;
@@ -173,7 +167,7 @@ public class TagFragment extends Fragment implements View.OnClickListener {
                     public void run() {
                         addTag();
                     }
-                },100);
+                }, 100);
                 break;
         }
     }
@@ -182,7 +176,7 @@ public class TagFragment extends Fragment implements View.OnClickListener {
         int position = Integer.parseInt(v.getTag().toString());
         TagAdapter tagAdapter = (TagAdapter) rvTags.getAdapter();
         Tag tag = tagAdapter.getTags().get(position);
-        ConfirmDialogFragment.newInstance(tag).show(getActivity().getSupportFragmentManager(),getString(R.string.tag_fragment_confirmdeletedialog));
+        ConfirmDialogFragment.newInstance(tag).show(getActivity().getSupportFragmentManager(), getString(R.string.tag_fragment_confirmdeletedialog));
 
     }
 
@@ -192,40 +186,40 @@ public class TagFragment extends Fragment implements View.OnClickListener {
         Tag tag = tagAdapter.getTags().get(position);
         tag.setSelected(!tag.isSelected());
         Paste paste = getArguments().getParcelable(ARG_PASTE);
-        paste.getTags().put(tag.getId(),tag);
-        tagAdapter.getTags().set(position,tag);
+        paste.getTags().put(tag.getId(), tag);
+        tagAdapter.getTags().set(position, tag);
         tagAdapter.notifyItemChanged(position);
     }
 
     private void addTag() {
-        if(etAddTag.getText().toString().contains(" ")){
+        if (etAddTag.getText().toString().contains(" ")) {
             etAddTag.setError(getString(R.string.error_message_nowhitespace));
             return;
         }
-        if(etAddTag.getText().length() < 3){
+        if (etAddTag.getText().length() < 3) {
             etAddTag.setError(getString(R.string.error_message_tag_length));
             return;
         }
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        if(uid!=null){
+        if (uid != null) {
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("tags").child(uid).push();
             String tagId = databaseReference.getKey();
             Tag newTag = new Tag();
             newTag.setId(tagId);
             newTag.setLabel(etAddTag.getText().toString());
             databaseReference.setValue(newTag);
-            TagAdapter tagAdapter = (TagAdapter)rvTags.getAdapter();
+            TagAdapter tagAdapter = (TagAdapter) rvTags.getAdapter();
             tagAdapter.getTags().add(newTag);
-            tagAdapter.notifyItemInserted(tagAdapter.getItemCount()-1);
+            tagAdapter.notifyItemInserted(tagAdapter.getItemCount() - 1);
             etAddTag.getText().clear();
         }
     }
 
     public HashMap<String, Tag> getTags() {
-        TagAdapter tagAdapter = (TagAdapter)rvTags.getAdapter();
-        HashMap<String,Tag> hashMap = new HashMap<>();
-        for(Tag tag : tagAdapter.getTags()){
-            if(tag.isSelected()) hashMap.put(tag.getId(),tag);
+        TagAdapter tagAdapter = (TagAdapter) rvTags.getAdapter();
+        HashMap<String, Tag> hashMap = new HashMap<>();
+        for (Tag tag : tagAdapter.getTags()) {
+            if (tag.isSelected()) hashMap.put(tag.getId(), tag);
         }
         return hashMap;
     }

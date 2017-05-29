@@ -1,8 +1,8 @@
 package app.paste_it.service;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,7 +12,6 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import app.paste_it.PasteItApplication;
 import app.paste_it.PasteUtils;
 import app.paste_it.R;
-import app.paste_it.Utils;
 import app.paste_it.models.DaoSession;
 import app.paste_it.models.ImageModel;
 import app.paste_it.models.ImageModelDao;
@@ -29,32 +27,24 @@ import app.paste_it.models.ImageModelDao;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
 public class ImageImportService extends IntentService {
 
-    private DaoSession daoSession;
 
-
-    // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     private static final String ACTION_IMPORT = "app.paste_it.service.action.FOO";
+    private static final String ACTION_IMPORT_PICTURE = "app.paste_it.service.action.FOOPICTURE";
     private static final String ACTION_DELETE = "app.paste_it.service.action.BAZ";
 
-    // TODO: Rename parameters
     private static final String EXTRA_URI = "app.paste_it.service.extra.PARAM1";
     private static final String EXTRA_ID = "app.paste_it.service.extra.PARAM2";
+    private static final String EXTRA_DATA = "app.paste_it.service.extra.PARAM3";
     private static final String TAG = ImageImportService.class.getSimpleName();
+    private DaoSession daoSession;
 
     public ImageImportService() {
         super("ImageImportService");
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        daoSession = ((PasteItApplication)getApplication()).getDaoSession();
     }
 
     /**
@@ -63,7 +53,6 @@ public class ImageImportService extends IntentService {
      *
      * @see IntentService
      */
-    // TODO: Customize helper method
     public static void startActionImport(Context context, Uri uri, ImageModel imageModel) {
         Intent intent = new Intent(context, ImageImportService.class);
         intent.setAction(ACTION_IMPORT);
@@ -78,7 +67,6 @@ public class ImageImportService extends IntentService {
      *
      * @see IntentService
      */
-    // TODO: Customize helper method
     public static void startActionDelete(Context context, Uri uri) {
         Intent intent = new Intent(context, ImageImportService.class);
         intent.setAction(ACTION_DELETE);
@@ -87,8 +75,15 @@ public class ImageImportService extends IntentService {
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        daoSession = ((PasteItApplication) getApplication()).getDaoSession();
+    }
+
+    @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
+            Log.d(TAG,"Action is: "+intent.getAction());
             final String action = intent.getAction();
             if (ACTION_IMPORT.equals(action)) {
                 final Uri uri = intent.getParcelableExtra(EXTRA_URI);
@@ -97,6 +92,10 @@ public class ImageImportService extends IntentService {
             } else if (ACTION_DELETE.equals(action)) {
                 final String param1 = intent.getStringExtra(EXTRA_URI);
                 handleActionDelete();
+            } else if (ACTION_IMPORT_PICTURE.equals(action)){
+                final Bitmap bitmap = intent.getParcelableExtra(EXTRA_DATA);
+                final ImageModel imageModel = intent.getParcelableExtra(EXTRA_ID);
+                handleActionImport(bitmap, imageModel);
             }
         }
     }
@@ -107,10 +106,8 @@ public class ImageImportService extends IntentService {
      */
     private void handleActionImport(Uri uri, ImageModel imageModel) {
         Log.d(TAG, "Starting image Import Service");
-        String fileName = imageModel.getId()+"_"+PasteUtils.getFileName(this,uri);
-        imageModel.setFileName(fileName);
         try {
-            FileOutputStream fos = this.openFileOutput(fileName,MODE_PRIVATE);
+            FileOutputStream fos = this.openFileOutput(imageModel.getFileName(), MODE_PRIVATE);
             Bitmap bitmap = BitmapFactory.decodeStream(this.getContentResolver().openInputStream(uri));
 
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
@@ -123,10 +120,36 @@ public class ImageImportService extends IntentService {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             Gson gson = new Gson();
-            editor.putString(getString(R.string.key_image_model_updated),gson.toJson(imageModel));
+            editor.putString(getString(R.string.key_image_model_updated), gson.toJson(imageModel));
             editor.commit();
 
-            Log.d(TAG,"Image Imported");
+            Log.d(TAG, "Image Imported");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void handleActionImport(Bitmap bitmap, ImageModel imageModel){
+        Log.d(TAG, "Starting picture Import Service");
+        try {
+            FileOutputStream fos = this.openFileOutput(imageModel.getFileName(), MODE_PRIVATE);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+            fos.close();
+
+            ImageModelDao imageModelDao = daoSession.getImageModelDao();
+            imageModelDao.insert(imageModel);
+
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            Gson gson = new Gson();
+            editor.putString(getString(R.string.key_image_model_updated), gson.toJson(imageModel));
+            editor.commit();
+
+            Log.d(TAG, "Image Imported");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -141,5 +164,14 @@ public class ImageImportService extends IntentService {
     private void handleActionDelete() {
         // TODO: Handle action Baz
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public static void startActionImportPicture(Context context, Bitmap bitmap, ImageModel imageModel) {
+        Intent intent = new Intent(context, ImageImportService.class);
+        intent.setAction(ACTION_IMPORT_PICTURE);
+        intent.putExtra(EXTRA_DATA, bitmap);
+        intent.putExtra(EXTRA_ID, imageModel);
+        Log.d(TAG,"Starting Picture Import Service.");
+        context.startService(intent);
     }
 }

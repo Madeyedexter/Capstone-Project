@@ -36,6 +36,8 @@ public class PasteHolder extends RecyclerView.ViewHolder implements View.OnClick
     LinearLayout llTagViewGroup;
     @BindView(R.id.rvImagePreview)
     RecyclerView rvImagePreview;
+    @BindView(R.id.selected_overlay)
+    public View selectedOverlay;
     CardView rootCard;
 
 

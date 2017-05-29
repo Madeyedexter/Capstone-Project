@@ -10,10 +10,12 @@ import app.paste_it.models.Tag;
 
 public class ConfirmDialogFragment extends DialogFragment {
 
-    public interface YesNoListener {
-        void onYes(Tag tag);
-
-        void onNo();
+    public static ConfirmDialogFragment newInstance(Tag tag) {
+        ConfirmDialogFragment confirmDialogFragment = new ConfirmDialogFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("TAG", tag);
+        confirmDialogFragment.setArguments(args);
+        return confirmDialogFragment;
     }
 
     @Override
@@ -40,11 +42,9 @@ public class ConfirmDialogFragment extends DialogFragment {
         return alertDialog;
     }
 
-    public static ConfirmDialogFragment newInstance(Tag tag){
-        ConfirmDialogFragment confirmDialogFragment = new ConfirmDialogFragment();
-        Bundle args = new Bundle();
-        args.putParcelable("TAG",tag);
-        confirmDialogFragment.setArguments(args);
-        return confirmDialogFragment;
+    public interface YesNoListener {
+        void onYes(Tag tag);
+
+        void onNo();
     }
 }

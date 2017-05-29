@@ -1,17 +1,12 @@
 package app.paste_it.adapters;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +32,7 @@ public class DrawerAdapter extends RecyclerView.Adapter {
 
     private View.OnClickListener onClickListener;
     private List<Tag> items = new ArrayList<>();
-    private int selectionPosition=1;
+    private int selectionPosition = 1;
 
     public DrawerAdapter(View.OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
@@ -79,41 +74,41 @@ public class DrawerAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        int viewType = getItemViewType(position);
-        if(viewType==VIEW_TYPE_USER_INFO){
-            UserInfoHolder userInfoHolder = (UserInfoHolder)holder;
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+
+        if (position == 0) {
+            UserInfoHolder userInfoHolder = (UserInfoHolder) holder;
             userInfoHolder.bindData();
             return;
-        }
-        if(viewType == VIEW_TYPE_DIVIDER || viewType == VIEW_TYPE_SECTION_HEADER){
+        } else if (position == 3 || position == items.size() + 5)
             return;
-        }
-        if(viewType == VIEW_TYPE_NO_SECTION){
+        else if (position == 1) {
             SectionHolder sectionHolder = (SectionHolder) holder;
-            if(position == getItemCount()-2)
-                sectionHolder.bindData(R.drawable.ic_settings_black_24dp, "Settings");
-            if(position == getItemCount()-1)
-                sectionHolder.bindData(R.drawable.ic_info_black_24dp, "About");
-            sectionHolder.itemView.setTag(R.string.selection_postion,position);
-        }
-        if(viewType == VIEW_TYPE_SECTION){
-            SectionHolder sectionHolder = (SectionHolder) holder;
-            if(position==1)
             sectionHolder.bindData(R.drawable.ic_note_black_24dp, "Pastes");
-            else if(position==2)
-                sectionHolder.bindData(R.drawable.ic_archive_black_24dp, "Archived");
-            else{
-                if(items.size()!=0){
-                    sectionHolder.bindData(R.drawable.ic_label_black_24dp,items.get(position%5).getLabel());
-                }
-            }
-            sectionHolder.itemView.setTag(R.string.selection_postion,position);
+            sectionHolder.itemView.setTag(R.string.selection_postion, position);
+        } else if (position == 2) {
+            SectionHolder sectionHolder = (SectionHolder) holder;
+            sectionHolder.bindData(R.drawable.ic_archive_black_24dp, "Archived");
+            sectionHolder.itemView.setTag(R.string.selection_postion, position);
+        } else if (position == 4)
+            return;
+        else if (position == getItemCount() - 2) {
+            SectionHolder sectionHolder = (SectionHolder) holder;
+            sectionHolder.bindData(R.drawable.ic_settings_black_24dp, "Settings");
+            sectionHolder.itemView.setTag(R.string.selection_postion, position);
+        } else if (position == getItemCount() - 1) {
+            SectionHolder sectionHolder = (SectionHolder) holder;
+            sectionHolder.bindData(R.drawable.ic_info_black_24dp, "About");
+            sectionHolder.itemView.setTag(R.string.selection_postion, position);
+        } else {
+            SectionHolder sectionHolder = (SectionHolder) holder;
+            sectionHolder.bindData(R.drawable.ic_label_black_24dp, items.get(position % 5).getLabel());
+            sectionHolder.itemView.setTag(R.string.selection_postion, position);
+            sectionHolder.itemView.setTag(R.string.tag, items.get(position % 5));
         }
-        if(position==selectionPosition){
+        if (position == selectionPosition) {
             holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorLightGrey));
-        }
-        else{
+        } else {
             holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.transparent));
         }
     }
@@ -129,9 +124,9 @@ public class DrawerAdapter extends RecyclerView.Adapter {
             return VIEW_TYPE_USER_INFO;
         if (position == 3 || position == items.size() + 5)
             return VIEW_TYPE_DIVIDER;
-        if (position == 1 || position == 2 || (position >=5 && position <= 5+items.size()) || position >= items.size()+8)
+        if (position == 1 || position == 2 || (position >= 5 && position < 5 + items.size()))
             return VIEW_TYPE_SECTION;
-        if(position==4)
+        if (position == 4)
             return VIEW_TYPE_SECTION_HEADER;
         else
             return VIEW_TYPE_NO_SECTION;
@@ -163,10 +158,10 @@ public class DrawerAdapter extends RecyclerView.Adapter {
 
         public SectionHolder(View rootView) {
             super(rootView);
-            ButterKnife.bind(this,rootView);
+            ButterKnife.bind(this, rootView);
         }
 
-        public void bindData(int drawableRes, String text){
+        public void bindData(int drawableRes, String text) {
             ivSectionIcon.setImageResource(drawableRes);
             tvSectionText.setText(text);
         }

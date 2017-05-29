@@ -6,14 +6,24 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 
 /**
  * Created by Madeyedexter on 14-05-2017.
  */
-public class Paste implements Parcelable {
+public class Paste implements Parcelable, Identity {
+    public static final Creator<Paste> CREATOR = new Creator<Paste>() {
+        @Override
+        public Paste createFromParcel(Parcel in) {
+            return new Paste(in);
+        }
+
+        @Override
+        public Paste[] newArray(int size) {
+            return new Paste[size];
+        }
+    };
     private String id;
     private long modified;
     private long created;
@@ -21,8 +31,10 @@ public class Paste implements Parcelable {
     private String text;
     private Map<String, ImageModel> urls = new LinkedHashMap<>();
     private boolean archived;
+    private HashMap<String, Tag> tags = new HashMap<>();
 
-    public Paste(){}
+    public Paste() {
+    }
 
     protected Paste(Parcel in) {
         id = in.readString();
@@ -33,14 +45,14 @@ public class Paste implements Parcelable {
         archived = in.readByte() != 0;
         tags = new LinkedHashMap<>();
         ArrayList<Tag> tagArrayList = in.createTypedArrayList(Tag.CREATOR);
-        for(Tag tag : tagArrayList){
-            tags.put(tag.getId(),tag);
+        for (Tag tag : tagArrayList) {
+            tags.put(tag.getId(), tag);
         }
         //LongSparseArray may be an alternative here
         urls = new HashMap<>();
         ArrayList<ImageModel> imageModelArrayList = in.createTypedArrayList(ImageModel.CREATOR);
-        for(ImageModel imageModel : imageModelArrayList){
-            urls.put(imageModel.getId(),imageModel);
+        for (ImageModel imageModel : imageModelArrayList) {
+            urls.put(imageModel.getId(), imageModel);
         }
     }
 
@@ -60,18 +72,6 @@ public class Paste implements Parcelable {
     public int describeContents() {
         return 0;
     }
-
-    public static final Creator<Paste> CREATOR = new Creator<Paste>() {
-        @Override
-        public Paste createFromParcel(Parcel in) {
-            return new Paste(in);
-        }
-
-        @Override
-        public Paste[] newArray(int size) {
-            return new Paste[size];
-        }
-    };
 
     public boolean isArchived() {
         return archived;
@@ -94,8 +94,6 @@ public class Paste implements Parcelable {
                 ", tags=" + tags +
                 '}';
     }
-
-    private HashMap<String,Tag> tags = new HashMap<>();
 
     public String getId() {
         return id;
@@ -145,11 +143,11 @@ public class Paste implements Parcelable {
         this.urls = urls;
     }
 
-    public HashMap<String,Tag> getTags() {
+    public HashMap<String, Tag> getTags() {
         return tags;
     }
 
-    public void setTags(HashMap<String,Tag> tags) {
+    public void setTags(HashMap<String, Tag> tags) {
         this.tags = tags;
     }
 

@@ -5,8 +5,6 @@
     <dimen name="signinbutton_margin_bottom">64dp</dimen>
     <dimen name="padding_caption">8dp</dimen>
 
-    <dimen name="toolbar_height">56dp</dimen>
-    <dimen name="fab_margin">24dp</dimen>
     <dimen name="margin_viewport">16dp</dimen>
     <dimen name="padding_text">8dp</dimen>
     <dimen name="margin_rv_paste">4dp</dimen>

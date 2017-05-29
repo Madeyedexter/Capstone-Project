@@ -10,7 +10,6 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -38,34 +37,34 @@ public class ImageUploadService extends IntentService {
 
     private static final String TAG = ImageUploadService.class.getSimpleName();
 
-    private StorageReference firebaseStorage = FirebaseStorage.getInstance().getReference("images/"+ FirebaseAuth.getInstance().getCurrentUser().getUid());
+    private StorageReference firebaseStorage = FirebaseStorage.getInstance().getReference("images/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
+    private DaoSession daoSession;
 
-    public ImageUploadService(){
+    public ImageUploadService() {
         super(TAG);
     }
 
-    private DaoSession daoSession;
     @Override
     public void onCreate() {
         super.onCreate();
-        daoSession = ((PasteItApplication)getApplication()).getDaoSession();
+        daoSession = ((PasteItApplication) getApplication()).getDaoSession();
     }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         String action = intent.getAction();
-        if(action!=null && action.equals(ACTION_IMAGE_UPLOAD)){
+        if (action != null && action.equals(ACTION_IMAGE_UPLOAD)) {
             ImageModelDao imageModelDao = daoSession.getImageModelDao();
             //get all image models whose dload url is null
 
             List<ImageModel> imageModels = imageModelDao.queryBuilder().where(ImageModelDao.Properties.DownloadURL.isNull()).build().list();
 
-            Log.d(TAG,"Image Models not uploaded: "+ imageModels);
+            Log.d(TAG, "Image Models not uploaded: " + imageModels);
 
             //start the upload
-            for(ImageModel imageModel : imageModels){
+            for (ImageModel imageModel : imageModels) {
                 InputStream inputStream = null;
-                UploadTask task=null;
+                UploadTask task = null;
                 try {
                     inputStream = this.openFileInput(imageModel.getFileName());
                     task = firebaseStorage.child(imageModel.getFileName()).putStream(inputStream);
@@ -80,24 +79,23 @@ public class ImageUploadService extends IntentService {
                     e.printStackTrace();
                 }
                 task.isSuccessful();
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
                     @SuppressWarnings("VisibleForTests")
                     Uri dloadUri = task.getResult().getDownloadUrl();
                     imageModel.setDownloadURL(dloadUri.toString());
                     imageModelDao.update(imageModel);
-                    Log.d(TAG,"Image Model after insert is: "+imageModel);
-                    FirebaseDatabase.getInstance().getReference("pastes/"+FirebaseAuth.getInstance().getCurrentUser().getUid()).child(imageModel.getPasteId())
+                    Log.d(TAG, "Image Model after insert is: " + imageModel);
+                    FirebaseDatabase.getInstance().getReference("pastes/" + FirebaseAuth.getInstance().getCurrentUser().getUid()).child(imageModel.getPasteId())
                             .child("urls").child(imageModel.getId()).setValue(imageModel);
 
                     //notify via shared preferences that the download uri has been updated
-                    SharedPreferences.Editor editor= PreferenceManager.getDefaultSharedPreferences(this).edit();
-                    editor.putString(getString(R.string.key_dload_uri_available),new Gson().toJson(imageModel));
+                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                    editor.putString(getString(R.string.key_dload_uri_available), new Gson().toJson(imageModel));
                     editor.commit();
+                } else {
+                    Log.d(TAG, "Task was not successful");
                 }
-                else {
-                    Log.d(TAG,"Task was not successful");
-                }
-                Log.d(TAG,"Task was succeesful: "+task.isSuccessful());
+                Log.d(TAG, "Task was succeesful: " + task.isSuccessful());
             }
         }
     }

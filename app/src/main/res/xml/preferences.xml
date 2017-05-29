@@ -1,0 +1,39 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    <PreferenceCategory
+        android:title="General"
+        android:key="pref_key_general_settings">
+        <CheckBoxPreference
+            android:key="pref_key_show_image_preview"
+            android:title="Show images in preview"
+            android:defaultValue="false"
+            android:summaryOn="Yes"
+            android:summaryOff="No"
+            />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title = "Notification">
+        <CheckBoxPreference
+            android:key="pref_key_show_notification"
+            android:title="Show notifications for saved items."
+            android:summaryOn="Yes"
+            android:summaryOff="No"/>
+        <ListPreference
+            android:key="pref_key_notification_day"
+            android:dependency="pref_key_show_notification"
+            android:entries="@array/day_of_week"
+            android:entryValues="@array/day_of_week"
+            android:defaultValue="@string/daily"
+            android:summary="@string/daily"
+            android:title="Day of Week"/>
+        <app.paste_it.TimePreference
+            android:key="pref_key_notification_time"
+            android:dependency="pref_key_show_notification"
+            android:summary="23:00"
+            android:defaultValue="23:00"
+            android:title="Set time"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -1,55 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_margin="4dp"
-    android:minHeight="64dp"
     android:clickable="true"
     android:focusable="true"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:foreground="?selectableItemBackground"
-    >
+    android:minHeight="64dp">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
         <android.support.v7.widget.RecyclerView
-            android:clickable="false"
             android:id="@+id/rvImagePreview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
+            android:clickable="false" />
+
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:text="A night at the museum"
             android:padding="@dimen/padding_text"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            />
+            tools:text="A night at the museum" />
+
         <TextView
             android:id="@+id/tvContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_text"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            tools:text="A Nice Walk in the park enjoyed a lot"
-            />
+            tools:text="A Nice Walk in the park enjoyed a lot" />
+
         <LinearLayout
             android:id="@+id/llTagsWrapper"
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            >
+            android:orientation="vertical">
+
             <LinearLayout
                 android:id="@+id/llTagViewGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_margin="8dp">
-            </LinearLayout>
+                android:layout_margin="8dp"
+                android:orientation="horizontal"></LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
+    <View
+        android:id="@+id/selected_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBlackTransparent"
+        android:visibility="invisible" />
 
 </android.support.v7.widget.CardView>

@@ -1,9 +1,7 @@
 package app.paste_it.models.holders;
 
-import android.icu.text.Normalizer2;
 import android.support.v7.widget.AppCompatCheckedTextView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
