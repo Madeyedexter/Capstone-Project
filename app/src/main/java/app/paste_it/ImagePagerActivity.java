@@ -1,6 +1,7 @@
 package app.paste_it;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.File;
 import java.util.List;
 
 import app.paste_it.models.ConfirmDialogMessage;
@@ -71,9 +73,23 @@ public class ImagePagerActivity extends AppCompatActivity{
                 return true;
             case R.id.miDelete: showConfirmDeleteDialog(mPagerAdapter.getItemAtPosition(mPager.getCurrentItem()));
                 return true;
-            case R.id.miShare: //share image
+            case R.id.miShare: startActionImageShare();
+                return true;
             default: return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void startActionImageShare() {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        ImageModel imageModel = mPagerAdapter.getItemAtPosition(mPager.getCurrentItem());
+        Uri uri = Uri.fromFile(new File(Utils.getFullPath(this,imageModel.getFileName())));
+        intent.putExtra(Intent.EXTRA_STREAM,uri);
+        if(imageModel.getFileName().split(".")[1].equalsIgnoreCase("png"))
+        intent.setType("image/png");
+        else
+            intent.setType("image/jpeg");
+        startActivity(Intent.createChooser(intent,getString(R.string.send_to)));
     }
 
     private void showConfirmDeleteDialog(ImageModel imageModel) {

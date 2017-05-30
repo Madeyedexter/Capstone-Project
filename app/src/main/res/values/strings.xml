@@ -122,5 +122,8 @@
     <string name="key_position">key_position</string>
     <string name="confirm_dialog_picture">Are you sure you want to delete this image?</string>
     <string name="key_sp_image_removed_id" />
+    <string name="app_version">v1.0</string>
+    <string name="open_source_statement">Following open source libraries were used in developing this application:</string>
+    <string name="send_to">Send to</string>
 
 </resources>

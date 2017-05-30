@@ -116,7 +116,8 @@ public class PastesFragment extends Fragment implements View.OnClickListener, Pa
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
+     * @param tag An optional tag parameter, passed when this fragment is created for a tag section
+     *            in the navigation drawer.
      * @return A new instance of fragment PastesFragment.
      */
     public static PastesFragment newInstance(String fragmentType, @Nullable Tag tag) {
