@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.paste_it.R;
+import app.paste_it.Utils;
 import app.paste_it.models.ImageModel;
 
 /**
@@ -40,9 +41,15 @@ public class PreviewImageAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ImageView imageView = (ImageView) holder.itemView;
-        String path = imageView.getContext().getFilesDir().getPath() + "/" + models.get(position).getFileName();
+        String path = Utils.getFullPath(imageView.getContext(), models.get(position).getFileName());
         File file = new File(path);
-        Picasso.with(imageView.getContext()).load(file).into(imageView);
+        if (file.exists()) {
+            Picasso.with(imageView.getContext()).load(file).into(imageView);
+        } else if(models.get(position).getDownloadURL()!=null){
+            Picasso.with(imageView.getContext()).load(models.get(position).getDownloadURL()).into(imageView);
+        } else{
+            imageView.setImageBitmap(null);
+        }
     }
 
     @Override

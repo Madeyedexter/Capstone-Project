@@ -32,7 +32,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+
 import app.paste_it.adapters.ImageAdapter;
+import app.paste_it.callbacks.ItemRemovedCallback;
+import app.paste_it.models.Identity;
 import app.paste_it.models.ImageModel;
 import app.paste_it.models.Paste;
 import app.paste_it.models.Tag;
@@ -47,7 +51,7 @@ import butterknife.ButterKnife;
  * Use the {@link PasteItFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PasteItFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener {
+public class PasteItFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, ItemRemovedCallback {
 
     private static final String TAG = PasteItFragment.class.getSimpleName();
 
@@ -257,15 +261,27 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
             getContext().startService(intent);
         }
         if (key.equals(getString(R.string.key_dload_uri_available))) {
-            String jsonString = sharedPreferences.getString(key, "");
+            String jsonString = sharedPreferences.getString(key,"");
             ImageModel imageModel = gson.fromJson(jsonString, ImageModel.class);
             if (imageModel.getPasteId().equals(paste.getId())) {
                 paste.getUrls().put(imageModel.getId(), imageModel);
-                int index = PasteUtils.findIndex(imageAdapter.getItems(), imageModel);
+                int index = PasteUtils.findIndexOfItemWithId(imageAdapter.getItems(), imageModel.getId());
                 Log.d(TAG, "Index is: " + index);
                 if (index > -1) {
                     imageAdapter.getItems().set(index, imageModel);
                     imageAdapter.notifyDataSetChanged();
+                }
+            }
+        }
+        //remove image
+        if(key.equals(getString(R.string.key_sp_image_removed_id))){
+            String id = sharedPreferences.getString(key, null);
+            if(id!=null){
+                paste.getUrls().remove(id);
+                int index = PasteUtils.findIndexOfItemWithId(imageAdapter.getItems(),id);
+                if(index > -1){
+                    imageAdapter.getItems().remove(index);
+                    imageAdapter.notifyItemRemoved(index);
                 }
             }
         }
@@ -293,7 +309,7 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
             Parcelable lloS = savedInstanceState.getParcelable(getString(R.string.key_ll_os));
             flexboxLayoutManager.onRestoreInstanceState(lloS);
         }
-        imageAdapter = new ImageAdapter(paste.getUrls().values());
+        imageAdapter = new ImageAdapter(paste.getUrls().values(), this);
         rvImages.setAdapter(imageAdapter);
 
         etTitle.setText(paste.getTitle());
@@ -327,6 +343,32 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         switch (v.getId()) {
             case R.id.llTagHolder:
                 showTagFragment();
+                break;
+            case R.id.ivImage:
+                int positionClicked = Integer.parseInt(v.getTag().toString());
+                launchImagePagerActivity(positionClicked);
+                break;
+        }
+    }
+
+    private void launchImagePagerActivity(int position){
+        Intent intent = new Intent(getContext(),ImagePagerActivity.class);
+        intent.putParcelableArrayListExtra(getString(R.string.key_image_models),(ArrayList<? extends Parcelable>) imageAdapter.getItems());
+        intent.putExtra(getString(R.string.key_position), position);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onItemRemoved(Identity item) {
+        String id = item.getId();
+        if(item instanceof ImageModel){
+            ImageAdapter imageAdapter = (ImageAdapter)rvImages.getAdapter();
+            int index = PasteUtils.findIndexOfItemWithId(imageAdapter.getItems(),id);
+            if(index > -1){
+                imageAdapter.getItems().remove(index);
+                imageAdapter.notifyItemRemoved(index);
+            }
+            paste.getUrls().remove(id);
         }
     }
 }

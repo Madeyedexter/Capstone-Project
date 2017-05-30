@@ -54,18 +54,29 @@
             android:exported="false" />
 
         <activity android:name=".SettingsActivity" />
-        <activity android:name=".ShareActivity" android:theme="@style/AppTheme.Transaparent">
+        <activity
+            android:name=".ShareActivity"
+            android:theme="@style/AppTheme.Transaparent">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="image/*" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+        <activity android:name=".ImagePagerActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme"
+            android:parentActivityName=".PasteItActivity"
+            />
     </application>
 
 </manifest>

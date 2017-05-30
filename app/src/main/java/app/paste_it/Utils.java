@@ -70,4 +70,8 @@ public final class Utils {
         int scalingFactor = 180;
         return (int) (dpWidth / scalingFactor);
     }
+
+    public static String getFullPath(Context context, String fileName) {
+        return context.getFilesDir().getPath() + "/" + fileName;
+    }
 }

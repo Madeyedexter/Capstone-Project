@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import app.paste_it.adapters.TagAdapter;
+import app.paste_it.models.ConfirmDialogMessage;
 import app.paste_it.models.Paste;
 import app.paste_it.models.Tag;
 import butterknife.BindView;
@@ -159,7 +160,7 @@ public class TagFragment extends Fragment implements View.OnClickListener {
                 checkTag(v);
                 break;
             case R.id.ibDeleteTag:
-                showDeletTagConfirmDialog(v);
+                showDeleteTagConfirmDialog(v);
                 break;
             case R.id.ibAddTag:
                 v.postDelayed(new Runnable() {
@@ -172,11 +173,12 @@ public class TagFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void showDeletTagConfirmDialog(View v) {
+    private void showDeleteTagConfirmDialog(View v) {
         int position = Integer.parseInt(v.getTag().toString());
         TagAdapter tagAdapter = (TagAdapter) rvTags.getAdapter();
         Tag tag = tagAdapter.getTags().get(position);
-        ConfirmDialogFragment.newInstance(tag).show(getActivity().getSupportFragmentManager(), getString(R.string.tag_fragment_confirmdeletedialog));
+        ConfirmDialogMessage message = new ConfirmDialogMessage(getString(R.string.confirm_delete),getString(R.string.confirm_dialog_message));
+        ConfirmDialogFragment.newInstance(tag, message).show(getActivity().getSupportFragmentManager(), getString(R.string.tag_fragment_confirmdeletedialog));
 
     }
 

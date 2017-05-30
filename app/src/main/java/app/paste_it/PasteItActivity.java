@@ -1,7 +1,11 @@
 package app.paste_it;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.Preference;
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -10,8 +14,11 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 
+import app.paste_it.callbacks.ItemRemovedCallback;
+import app.paste_it.models.ImageModel;
 import app.paste_it.models.Paste;
 import app.paste_it.models.Tag;
+import app.paste_it.service.ImageImportService;
 
 /**
  * A Standalone activity which will be launched whenever a user wants to save some content.
@@ -33,6 +40,7 @@ public class PasteItActivity extends AppCompatActivity implements ConfirmDialogF
         }
         if (savedInstanceState == null) {
             PasteItFragment pasteItFragment = PasteItFragment.newInstance(paste);
+            //to be notified whenever an item is removed from the fragment
             getSupportFragmentManager().beginTransaction().add(R.id.frame, pasteItFragment, getString(R.string.tag_pasteit_fragment)).commit();
         }
     }
@@ -42,9 +50,18 @@ public class PasteItActivity extends AppCompatActivity implements ConfirmDialogF
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
-    public void onYes(Tag tag) {
-        FirebaseDatabase.getInstance().getReference("tags").child(uid).child(tag.getId()).removeValue();
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onYes(Parcelable data) {
+        if(data instanceof Tag){
+            Tag tag = (Tag) data;
+            FirebaseDatabase.getInstance().getReference("tags").child(uid).child(tag.getId()).removeValue();
+        }
     }
 
     @Override
@@ -64,7 +81,6 @@ public class PasteItActivity extends AppCompatActivity implements ConfirmDialogF
                 pasteItFragment.addTags();
                 //also save the tags
                 pasteItFragment.savePaste();
-                Log.d(TAG, "Tags are: " + tags);
             }
 
         }

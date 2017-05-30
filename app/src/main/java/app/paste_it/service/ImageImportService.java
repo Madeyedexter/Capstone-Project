@@ -10,8 +10,11 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,6 +22,7 @@ import java.io.IOException;
 import app.paste_it.PasteItApplication;
 import app.paste_it.PasteUtils;
 import app.paste_it.R;
+import app.paste_it.Utils;
 import app.paste_it.models.DaoSession;
 import app.paste_it.models.ImageModel;
 import app.paste_it.models.ImageModelDao;
@@ -42,6 +46,8 @@ public class ImageImportService extends IntentService {
     private static final String EXTRA_DATA = "app.paste_it.service.extra.PARAM3";
     private static final String TAG = ImageImportService.class.getSimpleName();
     private DaoSession daoSession;
+
+    private String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     public ImageImportService() {
         super("ImageImportService");
@@ -67,10 +73,11 @@ public class ImageImportService extends IntentService {
      *
      * @see IntentService
      */
-    public static void startActionDelete(Context context, Uri uri) {
+    public static void startActionDelete(Context context, ImageModel imageModel) {
+        Log.d(TAG,"Starting delete operation.");
         Intent intent = new Intent(context, ImageImportService.class);
         intent.setAction(ACTION_DELETE);
-        intent.putExtra(EXTRA_URI, uri);
+        intent.putExtra(EXTRA_DATA, imageModel );
         context.startService(intent);
     }
 
@@ -90,8 +97,8 @@ public class ImageImportService extends IntentService {
                 final ImageModel imageModel = intent.getParcelableExtra(EXTRA_ID);
                 handleActionImport(uri, imageModel);
             } else if (ACTION_DELETE.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_URI);
-                handleActionDelete();
+                final ImageModel imageModel = intent.getParcelableExtra(EXTRA_DATA);
+                handleActionDelete(imageModel);
             } else if (ACTION_IMPORT_PICTURE.equals(action)){
                 final Bitmap bitmap = intent.getParcelableExtra(EXTRA_DATA);
                 final ImageModel imageModel = intent.getParcelableExtra(EXTRA_ID);
@@ -160,10 +167,25 @@ public class ImageImportService extends IntentService {
     /**
      * Handle action Baz in the provided background thread with the provided
      * parameters.
+     * @param imageModel
      */
-    private void handleActionDelete() {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
+    private void handleActionDelete(ImageModel imageModel) {
+        ImageModelDao imageModelDao = daoSession.getImageModelDao();
+        String path = Utils.getFullPath(this,imageModel.getFileName());
+        File imageFile = new File(path);
+        Log.d(TAG,"File exists: "+imageFile.exists());
+        //This call will trigger a firebase function which will remove the corresponding file from firebase storage
+        FirebaseDatabase.getInstance().getReference("pastes").child(uid).child(imageModel.getPasteId()).child("urls").child(imageModel.getId()).removeValue();
+        if(imageFile.exists()){
+            Log.d(TAG, "File Deleted: "+ imageFile.delete());
+        }
+        //remove greendao entry
+        imageModelDao.deleteByKey(imageModel.getId());
+
+        //notify via sp that the image has been deleted
+        SharedPreferences.Editor editor =  PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putString(getString(R.string.key_sp_image_removed_id),imageModel.getId());
+        editor.commit();
     }
 
     public static void startActionImportPicture(Context context, Bitmap bitmap, ImageModel imageModel) {

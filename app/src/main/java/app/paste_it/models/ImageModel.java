@@ -14,7 +14,7 @@ import org.greenrobot.greendao.annotation.Id;
  * Created by Madeyedexter on 13-05-2017.
  */
 @Entity
-public class ImageModel implements Parcelable {
+public class ImageModel implements Parcelable, Identity {
 
     public static final Creator<ImageModel> CREATOR = new Creator<ImageModel>() {
         @Override

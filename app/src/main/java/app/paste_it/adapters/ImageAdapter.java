@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 import app.paste_it.R;
+import app.paste_it.Utils;
 import app.paste_it.models.ImageModel;
 
 public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -25,8 +26,11 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         items = new ArrayList<>();
     }
 
-    public ImageAdapter(Collection<ImageModel> images) {
+    private View.OnClickListener onClickListener;
+
+    public ImageAdapter(Collection<ImageModel> images, View.OnClickListener onClickListener) {
         items = new ArrayList<>(images);
+        this.onClickListener = onClickListener;
     }
 
     public List<ImageModel> getItems() {
@@ -36,6 +40,7 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image, parent, false);
+        view.setOnClickListener(onClickListener);
         return new RecyclerView.ViewHolder(view) {
         };
     }
@@ -43,11 +48,14 @@ public class ImageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ImageView imageView = (ImageView) holder.itemView;
-        String path = holder.itemView.getContext().getFilesDir().getPath() + "/" + items.get(position).getFileName();
+        imageView.setTag(position);
+        String path = Utils.getFullPath(imageView.getContext(),items.get(position).getFileName());
         File file = new File(path);
         if (file.exists()) {
             Picasso.with(imageView.getContext()).load(file).into(imageView);
-        } else {
+        } else if(items.get(position).getDownloadURL()!=null){
+            Picasso.with(imageView.getContext()).load(items.get(position).getDownloadURL()).into(imageView);
+        } else{
             imageView.setImageBitmap(null);
         }
     }
