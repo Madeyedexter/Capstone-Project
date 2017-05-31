@@ -135,10 +135,12 @@ public class MainActivity extends AppCompatActivity implements
         final String sectionText = ((TextView) v.findViewById(R.id.tvSectionText)).getText().toString();
         if(sectionText.equals(getString(R.string.settings))){
             launchSettingsActivity();
+            drawerLayout.closeDrawer(Gravity.START,true);
             return;
         }
         if(sectionText.equals(getString(R.string.about))){
             launchAboutActivity();
+            drawerLayout.closeDrawer(Gravity.START,true);
             return;
         }
         switch (v.getId()) {
@@ -175,7 +177,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void launchAboutActivity() {
-        //TODO: Launch About Activity
+        Intent intent = new Intent(this, AboutActivity.class);
+        startActivity(intent);
     }
 
     private void launchSettingsActivity() {

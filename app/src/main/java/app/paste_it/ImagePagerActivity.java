@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +35,9 @@ public class ImagePagerActivity extends AppCompatActivity{
 
     private static final String TAG = ImagePagerActivity.class.getSimpleName();
     private String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+
+    private static final String FILE_AUTHORITY = "app.paste_it.fileprovider";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,9 +87,9 @@ public class ImagePagerActivity extends AppCompatActivity{
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
         ImageModel imageModel = mPagerAdapter.getItemAtPosition(mPager.getCurrentItem());
-        Uri uri = Uri.fromFile(new File(Utils.getFullPath(this,imageModel.getFileName())));
+        Uri uri = FileProvider.getUriForFile(this,FILE_AUTHORITY,new File(Utils.getFullPath(this,imageModel.getFileName())));
         intent.putExtra(Intent.EXTRA_STREAM,uri);
-        if(imageModel.getFileName().split(".")[1].equalsIgnoreCase("png"))
+        if(imageModel.getFileName().endsWith("png") || imageModel.getFileName().endsWith("PNG"))
         intent.setType("image/png");
         else
             intent.setType("image/jpeg");

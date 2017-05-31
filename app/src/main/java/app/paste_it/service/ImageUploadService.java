@@ -83,7 +83,7 @@ public class ImageUploadService extends IntentService {
                     @SuppressWarnings("VisibleForTests")
                     Uri dloadUri = task.getResult().getDownloadUrl();
                     imageModel.setDownloadURL(dloadUri.toString());
-                    imageModelDao.update(imageModel);
+                    imageModelDao.deleteByKey(imageModel.getId());
                     Log.d(TAG, "Image Model after insert is: " + imageModel);
                     FirebaseDatabase.getInstance().getReference("pastes/" + FirebaseAuth.getInstance().getCurrentUser().getUid()).child(imageModel.getPasteId())
                             .child("urls").child(imageModel.getId()).setValue(imageModel);

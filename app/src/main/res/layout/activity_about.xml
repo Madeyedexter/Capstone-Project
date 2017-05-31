@@ -4,15 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="app.paste_it.AboutActivity">
+    tools:context="app.paste_it.AboutActivity"
+    android:maxWidth="600dp"
+    android:layout_gravity="center"
+    >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_margin="16dp"
         android:orientation="vertical">
+
         <TextView
             android:id="@+id/tvHeader"
             android:gravity="center"
+            android:layout_marginTop="32dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
@@ -31,6 +37,16 @@
             android:layout_height="wrap_content"
             android:text="@string/open_source_statement"
             />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvOpenSourceContribution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            tools:listitem = "@layout/item_open_source_library"
+            android:nestedScrollingEnabled="true"
+            >
+
+        </android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
 </ScrollView>

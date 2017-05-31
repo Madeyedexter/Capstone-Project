@@ -1,0 +1,45 @@
+[
+	{
+	"libraryName": "Butterknife",
+	"copyright": "Copyright (c) 2013, Jake Wharton",
+	"license": "Apache 2.0",
+	"website": "http://jakewharton.github.io/butterknife"
+	},
+
+	{
+		"libraryName": "Greendao",
+		"copyright": "Copyright (c) 2016, greenrobot",
+		"license": "Apache 2.0",
+		"website": "http://greenrobot.org/greendao"
+	}, {
+		"libraryName": "picasso",
+		"copyright": "Copyright 2013 Square, Inc.",
+		"license": "Apache 2.0",
+		"website": "http://square.github.io/picasso"
+	}, {
+		"libraryName": "Gson",
+		"copyright": "Copyright 2008 Google Inc.",
+		"license": "Apache 2.0",
+		"website": "https://github.com/google/gson"
+	}, {
+		"libraryName": "flexbox",
+		"copyright": "Copyright 2016 Google Inc.",
+		"license": "Apache 2.0",
+		"website": "https://github.com/google/flexbox-layout"
+	}, {
+		"libraryName": "CircleImageView",
+		"copyright": "Copyright 2014 - 2017 Henning Dodenhof",
+		"license": "Apache 2.0",
+		"website": "https://github.com/hdodenhof/CircleImageView"
+	}, {
+		"libraryName": "Pretty Time",
+		"copyright": "Copyright 2017 OCPsoft",
+		"license": "Apache 2.0",
+		"website": "http://www.ocpsoft.org/prettytime"
+	}, {
+		"libraryName": "Firebase Job Dispatcher",
+		"copyright": "Copyright 2017 Google Inc.",
+		"license": "Apache 2.0",
+		"website": "https://github.com/firebase/firebase-jobdispatcher-android"
+	}
+]
