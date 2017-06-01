@@ -53,10 +53,10 @@
             android:name=".service.ImageImportService"
             android:exported="false" />
 
-        <activity android:name=".SettingsActivity"
+        <activity
+            android:name=".SettingsActivity"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme"
-            />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".ShareActivity"
             android:theme="@style/AppTheme.Transaparent">
@@ -80,23 +80,48 @@
             android:launchMode="singleTop"
             android:parentActivityName=".PasteItActivity"
             android:theme="@style/AppTheme" />
-        <activity android:name=".AboutActivity"
+        <activity
+            android:name=".AboutActivity"
             android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity"
-            />
+            android:parentActivityName=".MainActivity" />
+
         <provider
-            android:authorities="app.paste_it.fileprovider"
             android:name="android.support.v4.content.FileProvider"
+            android:authorities="app.paste_it.fileprovider"
             android:exported="false"
-            android:grantUriPermissions="true"
-            >
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
+
             <paths xmlns:android="http://schemas.android.com/apk/res/android">
-                <files-path android:name="my_images" android:path="/"/>
+                <files-path
+                    android:name="my_images"
+                    android:path="/" />
             </paths>
-            </provider>
+        </provider>
+
+        <receiver android:name=".PasteItWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/paste_it_widget_info" />
+        </receiver>
+
+        <activity android:name=".PasteItWidgetConfigureActivity">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".service.PasteItWidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            />
     </application>
 
 </manifest>

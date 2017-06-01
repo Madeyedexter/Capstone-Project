@@ -127,5 +127,8 @@
     <string name="send_to">Send to</string>
     <string name="license">License: %1$s</string>
     <string name="website">Website: %1$s</string>
+    <string name="configure">Configure Widget Settings</string>
+    <string name="add_widget">Add widget</string>
+    <string name="widget_item_count_error">\"Item count must be an Integer between 3 and 8\"</string>
 
 </resources>
