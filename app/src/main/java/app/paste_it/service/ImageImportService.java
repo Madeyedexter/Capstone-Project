@@ -20,7 +20,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import app.paste_it.PasteItApplication;
-import app.paste_it.PasteUtils;
 import app.paste_it.R;
 import app.paste_it.Utils;
 import app.paste_it.models.DaoSession;
@@ -167,7 +166,7 @@ public class ImageImportService extends IntentService {
     /**
      * Handle action Baz in the provided background thread with the provided
      * parameters.
-     * @param imageModel
+     * @param imageModel the imageModel corresponding to the image
      */
     private void handleActionDelete(ImageModel imageModel) {
         ImageModelDao imageModelDao = daoSession.getImageModelDao();

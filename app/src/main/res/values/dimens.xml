@@ -7,7 +7,6 @@
 
     <dimen name="margin_viewport">16dp</dimen>
     <dimen name="padding_text">8dp</dimen>
-    <dimen name="margin_rv_paste">4dp</dimen>
 
     <!--
 Refer to App Widget Documentation for margin information

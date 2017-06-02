@@ -1,12 +1,8 @@
 package app.paste_it;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.Preference;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -14,11 +10,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 
-import app.paste_it.callbacks.ItemRemovedCallback;
-import app.paste_it.models.ImageModel;
 import app.paste_it.models.Paste;
 import app.paste_it.models.Tag;
-import app.paste_it.service.ImageImportService;
 
 /**
  * A Standalone activity which will be launched whenever a user wants to save some content.

@@ -85,25 +85,25 @@ public class DrawerAdapter extends RecyclerView.Adapter {
         else if (position == 1) {
             SectionHolder sectionHolder = (SectionHolder) holder;
             sectionHolder.bindData(R.drawable.ic_note_black_24dp, "Pastes");
-            sectionHolder.itemView.setTag(R.string.selection_postion, position);
+            sectionHolder.itemView.setTag(R.string.selection_position, position);
         } else if (position == 2) {
             SectionHolder sectionHolder = (SectionHolder) holder;
             sectionHolder.bindData(R.drawable.ic_archive_black_24dp, "Archived");
-            sectionHolder.itemView.setTag(R.string.selection_postion, position);
+            sectionHolder.itemView.setTag(R.string.selection_position, position);
         } else if (position == 4)
             return;
         else if (position == getItemCount() - 2) {
             SectionHolder sectionHolder = (SectionHolder) holder;
             sectionHolder.bindData(R.drawable.ic_settings_black_24dp, "Settings");
-            sectionHolder.itemView.setTag(R.string.selection_postion, position);
+            sectionHolder.itemView.setTag(R.string.selection_position, position);
         } else if (position == getItemCount() - 1) {
             SectionHolder sectionHolder = (SectionHolder) holder;
             sectionHolder.bindData(R.drawable.ic_info_black_24dp, "About");
-            sectionHolder.itemView.setTag(R.string.selection_postion, position);
+            sectionHolder.itemView.setTag(R.string.selection_position, position);
         } else {
             SectionHolder sectionHolder = (SectionHolder) holder;
             sectionHolder.bindData(R.drawable.ic_label_black_24dp, items.get(position % 5).getLabel());
-            sectionHolder.itemView.setTag(R.string.selection_postion, position);
+            sectionHolder.itemView.setTag(R.string.selection_position, position);
             sectionHolder.itemView.setTag(R.string.tag, items.get(position % 5));
         }
         if (position == selectionPosition) {

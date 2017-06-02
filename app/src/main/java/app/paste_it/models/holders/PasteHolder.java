@@ -92,7 +92,7 @@ public class PasteHolder extends RecyclerView.ViewHolder implements View.OnClick
                 llTagViewGroup.addView(textView);
                 if(count==3){
                     int remaining = paste.getTags().size()-count+1;
-                    textView.setText("+ "+remaining);
+                    textView.setText(String.format(textView.getContext().getString(R.string.tag_count),String.valueOf(remaining)));
                     break;
                 }
 

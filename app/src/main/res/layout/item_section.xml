@@ -15,6 +15,7 @@
         android:layout_gravity="center"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
+        android:contentDescription="@string/section_icon"
         app:srcCompat="@drawable/ic_image_black_24dp" />
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"

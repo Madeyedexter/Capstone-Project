@@ -3,5 +3,5 @@
     <item
         android:id="@+id/miUnArchive"
         android:icon="@drawable/ic_unarchive_black_24dp"
-        android:title="Unarchive" />
+        android:title="@string/unarchive" />
 </menu>

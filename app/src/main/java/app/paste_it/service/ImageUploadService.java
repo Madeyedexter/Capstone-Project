@@ -63,7 +63,7 @@ public class ImageUploadService extends IntentService {
 
             //start the upload
             for (ImageModel imageModel : imageModels) {
-                InputStream inputStream = null;
+                InputStream inputStream;
                 UploadTask task = null;
                 try {
                     inputStream = this.openFileInput(imageModel.getFileName());

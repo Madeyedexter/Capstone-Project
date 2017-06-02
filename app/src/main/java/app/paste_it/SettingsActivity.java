@@ -1,11 +1,7 @@
 package app.paste_it;
 
-import android.app.Activity;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-import app.paste_it.R;
+import android.support.v7.app.AppCompatActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 

@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements
         if (savedInstanceState != null) {
             linearLayoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(getString(R.string.rvOsDrawer)));
             sectionText = savedInstanceState.getString(getString(R.string.key_section));
-            selectedPosition = savedInstanceState.getInt(getString(R.string.selection_postion));
+            selectedPosition = savedInstanceState.getInt(getString(R.string.selection_position));
         } else {
             PastesFragment pastesFragment = PastesFragment.newInstance(sectionText, null);
             getSupportFragmentManager().beginTransaction().replace(R.id.frame, pastesFragment).commit();
@@ -121,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements
 
 
         Utils.verifyStoragePermissions(this);
-        Utils.verifyManageDocumentsPermissions(this);
     }
 
     @Override
@@ -146,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements
         switch (v.getId()) {
             default:
 
-                final int position = Integer.parseInt(v.getTag(R.string.selection_postion).toString());
+                final int position = Integer.parseInt(v.getTag(R.string.selection_position).toString());
                 DrawerAdapter drawerAdapter = ((DrawerAdapter) rvLeftDrawer.getAdapter());
                 if (position != drawerAdapter.getSelectionPosition() && drawerAdapter.getItemViewType(position) == DrawerAdapter.VIEW_TYPE_SECTION) {
                     drawerAdapter.setSelectionPosition(position);
@@ -189,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(getString(R.string.rvOsDrawer), rvLeftDrawer.getLayoutManager().onSaveInstanceState());
-        outState.putInt(getString(R.string.selection_postion), ((DrawerAdapter) rvLeftDrawer.getAdapter()).getSelectionPosition());
+        outState.putInt(getString(R.string.selection_position), ((DrawerAdapter) rvLeftDrawer.getAdapter()).getSelectionPosition());
         outState.putString(getString(R.string.key_section), getTitle().toString());
         super.onSaveInstanceState(outState);
     }
@@ -220,12 +218,7 @@ public class MainActivity extends AppCompatActivity implements
                     // contacts-related task you need to do.
                     Log.d(TAG, "Permission Granted");
 
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                 }
-                return;
             }
 
             // other 'case' lines to check for other

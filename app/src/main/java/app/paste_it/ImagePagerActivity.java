@@ -2,32 +2,26 @@ package app.paste_it;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Parcelable;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
 import java.util.List;
 
 import app.paste_it.models.ConfirmDialogMessage;
 import app.paste_it.models.ImageModel;
-import app.paste_it.service.ImageImportService;
-import app.paste_it.service.ImageUploadService;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -138,8 +132,7 @@ public class ImagePagerActivity extends AppCompatActivity{
 
         @Override
         public Fragment getItem(int position) {
-            Fragment fragment = ScreenSlidePageFragment.newInstance(imageModelList.get(position));
-            return fragment;
+            return ScreenSlidePageFragment.newInstance(imageModelList.get(position));
         }
 
         @Override

@@ -1,22 +1,19 @@
 package app.paste_it;
 
 import android.content.res.AssetManager;
-import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonStreamParser;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -75,8 +72,7 @@ public class AboutActivity extends AppCompatActivity implements LoaderManager.Lo
                     Gson gson = new GsonBuilder().create();
                     Reader reader = new InputStreamReader(inputStream);
                     Type type = new TypeToken<List<OpenSourceLibrary>>(){}.getType();
-                    List<OpenSourceLibrary> openSourceLibraries = gson.fromJson(reader,type);
-                    return openSourceLibraries;
+                    return gson.fromJson(reader,type);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;
@@ -87,7 +83,6 @@ public class AboutActivity extends AppCompatActivity implements LoaderManager.Lo
                             inputStream.close();
                         } catch (IOException e) {
                             e.printStackTrace();
-                            return null;
                         }
                     }
                 }

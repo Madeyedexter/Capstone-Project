@@ -36,8 +36,7 @@ public class PasteUtils {
         for (Identity identity : pastes) {
             pasteIds.add(identity.getId());
         }
-        String pasteIdsString = TextUtils.join(",", pasteIds);
-        return pasteIdsString;
+        return TextUtils.join(",", pasteIds);
     }
 
     private static int containsPaste(List<Paste> pastes, Paste paste) {
@@ -84,12 +83,14 @@ public class PasteUtils {
         return -1;
     }
 
-    public static String getFileName(Context ccontext, Uri uri) {
-        Cursor cursor = ccontext.getContentResolver().query(uri, null, null, null, null);
+    public static String getFileName(Context context, Uri uri) {
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
         int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-        int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+        //int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
         cursor.moveToFirst();
-        return cursor.getString(nameIndex);
+        String fileName =cursor.getString(nameIndex);
+        cursor.close();
+        return fileName;
     /*
      * Get the column indexes of the data in the Cursor,
      * move to the first row in the Cursor, get the data,

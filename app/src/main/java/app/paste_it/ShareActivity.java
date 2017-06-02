@@ -2,8 +2,8 @@ package app.paste_it;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,9 +14,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
-
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 
 import app.paste_it.models.ImageModel;
 import app.paste_it.models.Paste;
@@ -63,7 +60,7 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
             }
         }
         else{
-            Toast.makeText(this,"Unsupported Data.",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.unsupported_data,Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -84,12 +81,12 @@ public class ShareActivity extends AppCompatActivity implements View.OnClickList
 
     private void savePaste() {
         if(UID == null){
-            Toast.makeText(this,"You must log in first.",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.sign_in_message,Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
         if(etTitle.getText().length()==0 && etContent.getText().length()==0 && imageUri==null){
-            Toast.makeText(this,"Nothing pasted :(",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.nothing_pasted,Toast.LENGTH_SHORT).show();
             finish();
             return;
         }

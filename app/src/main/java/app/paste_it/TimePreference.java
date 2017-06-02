@@ -1,16 +1,10 @@
 package app.paste_it;
+
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.os.Parcelable;
-import android.preference.DialogPreference;
-import android.support.v7.preference.Preference;
 import android.util.AttributeSet;
-import android.view.View;
-import android.widget.TimePicker;
 
 public class TimePreference extends android.support.v7.preference.DialogPreference{
-    private int lastHour=12;
-    private int lastMinute=50;
 
     public static int getHour(String time) {
         String[] pieces=time.split(":");
@@ -40,7 +34,7 @@ public class TimePreference extends android.support.v7.preference.DialogPreferen
 
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
-        String time=null;
+        String time;
         if (restoreValue) {
             if (defaultValue==null) {
                 time=getPersistedString("00:00");
@@ -52,7 +46,7 @@ public class TimePreference extends android.support.v7.preference.DialogPreferen
         else {
             time=defaultValue.toString();
         }
-        lastHour=getHour(time);
-        lastMinute=getMinute(time);
+        int lastHour = getHour(time);
+        int lastMinute = getMinute(time);
     }
 }

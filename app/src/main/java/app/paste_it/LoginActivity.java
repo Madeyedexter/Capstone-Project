@@ -94,7 +94,7 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(this, "Unable to access google APIs. Make sure you have google play services installed and it is working properly."
+        Toast.makeText(this, R.string.google_api_inaccessible
                 , Toast.LENGTH_LONG).show();
     }
 
@@ -114,11 +114,11 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            Toast.makeText(this, "Signed in as: " + acct.getDisplayName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, String.format(getString(R.string.signed_in_as),acct.getDisplayName()), Toast.LENGTH_SHORT).show();
             firebaseAuthWithGoogle(acct);
         } else {
             // Signed out, show unauthenticated UI.
-            Toast.makeText(this, "Signed Out", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.signed_out, Toast.LENGTH_SHORT).show();
             updateUI(null);
         }
     }
@@ -139,7 +139,7 @@ public class LoginActivity extends AppCompatActivity implements OnClickListener,
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, R.string.auth_failed, Toast.LENGTH_SHORT).show();
                             updateUI(null);
                         }
                     }

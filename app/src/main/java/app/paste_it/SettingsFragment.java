@@ -1,11 +1,9 @@
 package app.paste_it;
 
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.EditTextPreference;
@@ -44,12 +42,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         Preference preference = findPreference(key);
         if(preference!=null && (preference instanceof ListPreference || preference instanceof EditTextPreference || preference instanceof DialogPreference)){
             preference.setSummary(sharedPreferences.getString(key,null));
-        }
-        if(key.equals(getString(R.string.pref_key_show_notification))){
-            Boolean showNotif = sharedPreferences.getBoolean(key,true);
-            if(showNotif){
-
-            }
         }
     }
 

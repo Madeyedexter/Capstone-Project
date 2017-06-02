@@ -93,12 +93,6 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-
-            <paths xmlns:android="http://schemas.android.com/apk/res/android">
-                <files-path
-                    android:name="my_images"
-                    android:path="/" />
-            </paths>
         </provider>
 
         <receiver android:name=".PasteItWidget">

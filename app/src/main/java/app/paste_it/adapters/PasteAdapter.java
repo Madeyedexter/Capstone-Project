@@ -60,7 +60,7 @@ public class PasteAdapter extends SelectableAdapter {
     }
 
     public void addPastes(int position, List<Paste> pastes) {
-        pastes.addAll(position, pastes);
+        this.pastes.addAll(position, pastes);
         notifyItemRangeInserted(position, pastes.size());
     }
 
@@ -83,22 +83,20 @@ public class PasteAdapter extends SelectableAdapter {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
             case ITEM_TYPE_DATA:
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickListener.onThumbClicked(position);
+                        clickListener.onThumbClicked(holder.getAdapterPosition());
                     }
                 });
                 holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        return clickListener != null ? clickListener.onThumbLongClicked(position) : false;
+                        return clickListener != null && clickListener.onThumbLongClicked(holder.getAdapterPosition());
                     }
-
-                    ;
                 });
                 ((PasteHolder) holder).bindData(pastes.get(position));
                 ((PasteHolder) holder).selectedOverlay.setVisibility(isSelected(position) ? View.VISIBLE : View.INVISIBLE);

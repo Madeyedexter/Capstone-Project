@@ -18,7 +18,7 @@
         android:padding="16dp"
         android:textColor="@android:color/black"
         android:textSize="16sp"
-        android:text="Nothing to show."
+        android:text="@string/nothing_to_show"
         />
 
 </LinearLayout>

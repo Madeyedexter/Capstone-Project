@@ -218,8 +218,8 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         paste.setTitle(title);
         paste.setText(content);
 
-        String id = null;
-        DatabaseReference newPasteRef = null;
+        String id;
+        DatabaseReference newPasteRef;
         if (paste.getId() == null) {
             newPasteRef = FirebaseDatabase.getInstance().getReference("pastes/" + UID).push();
             id = newPasteRef.getKey();
@@ -233,7 +233,7 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         if (paste.getModified() != 0) {
 
             tvLastUpdated.setVisibility(View.VISIBLE);
-            tvLastUpdated.setText("Changes Saved: " + PasteUtils.getAgoString(paste.getModified()));
+            tvLastUpdated.setText(String.format(getString(R.string.changes_saved),PasteUtils.getAgoString(paste.getModified())));
         }
         return id;
     }
@@ -319,7 +319,7 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         llTagHolder.setOnClickListener(this);
         if (paste.getModified() != 0) {
             tvLastUpdated.setVisibility(View.VISIBLE);
-            tvLastUpdated.setText("Last Modified: " + PasteUtils.getAgoString(paste.getModified()));
+            tvLastUpdated.setText(String.format(getString(R.string.last_modified),PasteUtils.getAgoString(paste.getModified())));
         }
         return view;
     }
@@ -328,7 +328,7 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
     public void addTags() {
         llTagHolder.removeAllViews();
         for (Tag tag : paste.getTags().values()) {
-            TextView textView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.item_textview_tag, null);
+            TextView textView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.item_textview_tag, llTagHolder,false);
             textView.setText(tag.getLabel());
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             layoutParams.setMargins(16, 16, 16, 16);

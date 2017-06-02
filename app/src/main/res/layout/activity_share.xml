@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_viewport"
             android:background="@null"
-            android:hint="Title (Optional)"
+            android:hint="@string/hint_title"
             android:inputType="text"
             android:lines="1"
             android:maxLines="1"
@@ -28,6 +28,7 @@
             />
         <ImageView
             android:id="@+id/ivImage"
+            android:contentDescription="@string/imported_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scaleType="centerCrop"/>
@@ -39,7 +40,7 @@
             android:layout_margin="@dimen/margin_viewport"
             android:background="@null"
             android:gravity="top"
-            android:hint="Enter text here"
+            android:hint="@string/enter_text_here"
             android:minLines="8"
             android:maxLines="8"
             android:textAppearance="?android:textAppearanceMedium" />
@@ -49,7 +50,7 @@
             android:background="@color/dividerGrey"
             />
         <LinearLayout
-            android:layout_gravity="end|right"
+            android:layout_gravity="end"
             android:layout_marginLeft="@dimen/margin_viewport"
             android:layout_marginStart="@dimen/margin_viewport"
             android:layout_marginEnd="@dimen/margin_viewport"
@@ -61,14 +62,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?selectableItemBackground"
-                android:text="Save"
+                android:text="@string/save"
+                style="?android:attr/buttonBarButtonStyle"
                 />
             <Button
                 android:id="@+id/buttonDiscard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?selectableItemBackground"
-                android:text="Discard"
+                android:text="@string/discard"
+                style="?android:attr/buttonBarButtonStyle"
                 />
         </LinearLayout>
 

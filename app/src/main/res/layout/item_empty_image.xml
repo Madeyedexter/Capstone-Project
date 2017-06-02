@@ -6,9 +6,10 @@
     android:orientation="vertical">
 
     <ImageView
-        android:layout_width="300px"
-        android:layout_height="300px"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:layout_gravity="center"
+        android:contentDescription="@string/empty_image"
         android:src="@drawable/desert_nobg" />
 
     <TextView
@@ -17,7 +18,7 @@
         android:layout_gravity="center"
         android:layout_margin="@dimen/padding_text"
         android:gravity="center"
-        android:text="It's lonely out here..."
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+        android:text="@string/empty_text"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
 </LinearLayout>

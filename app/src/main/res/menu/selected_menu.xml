@@ -3,5 +3,5 @@
     <item
         android:id="@+id/miArchive"
         android:icon="@drawable/ic_archive_black_24dp"
-        android:title="Archive"></item>
+        android:title="@string/archive"/>
 </menu>

@@ -170,11 +170,7 @@ public class PastesFragment extends Fragment implements View.OnClickListener, Pa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
-        if (savedInstanceState != null) {
 
-        }
         pasteReference.addChildEventListener(childEventListener);
     }
 
@@ -192,6 +188,7 @@ public class PastesFragment extends Fragment implements View.OnClickListener, Pa
         super.onSaveInstanceState(outState);
         outState.putString(getString(R.string.key_section), getActivity().getTitle().toString());
         outState.putParcelable(getString(R.string.key_rvos), rvPaste.getLayoutManager().onSaveInstanceState());
+        //noinspection unchecked
         outState.putIntegerArrayList(getString(R.string.key_selected_items), (ArrayList<Integer>) ((PasteAdapter) rvPaste.getAdapter()).getSelectedItems());
         outState.putBoolean(getString(R.string.key_action_mode_started), actionMode != null);
         outState.putBoolean(getString(R.string.is_swipe_refreshing), srLayout.isRefreshing());
@@ -342,7 +339,7 @@ public class PastesFragment extends Fragment implements View.OnClickListener, Pa
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             PasteAdapter pasteAdapter = (PasteAdapter) rvPaste.getAdapter();
-            List<Integer> items = pasteAdapter.getSelectedItems();
+            @SuppressWarnings("unchecked") List<Integer> items = pasteAdapter.getSelectedItems();
             switch (item.getItemId()) {
                 case R.id.miArchive:
                     for (int i : items) {

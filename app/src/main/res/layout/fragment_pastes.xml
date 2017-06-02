@@ -28,5 +28,6 @@
         app:srcCompat="@drawable/ic_add_white_24dp"
         app:elevation="6dp"
         app:borderWidth="1dp"
+        android:contentDescription="@string/new_paste"
         />
 </FrameLayout>
