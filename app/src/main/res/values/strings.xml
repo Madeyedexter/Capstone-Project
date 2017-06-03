@@ -96,5 +96,12 @@
     <string name="unsupported_data">Unsupported Data.</string>
     <string name="sign_in_message">You must log in first.</string>
     <string name="nothing_pasted">Nothing pasted :(</string>
+    <string name="add_new_tag">Add a new tag</string>
+    <string name="error_fetching_data">An error occurred while fetching data</string>
+    <string name="end_of_data">End of Content.</string>
+    <string name="select_picture">Select Picture</string>
+    <string name="set_time">Set Time</string>
+    <string name="set">Set</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

@@ -33,6 +33,8 @@ public class AboutActivity extends AppCompatActivity implements LoaderManager.Lo
 
     private static final int LIBRARY_LOADER_ID = 1;
 
+    private static final String FOSS_CONTRIB_FILENAME = "open_source_contrib_list.json";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +70,7 @@ public class AboutActivity extends AppCompatActivity implements LoaderManager.Lo
                 AssetManager assetManager = getAssets();
                 InputStream inputStream=null;
                 try {
-                    inputStream = assetManager.open("open_source_contrib_list.json");
+                    inputStream = assetManager.open(FOSS_CONTRIB_FILENAME);
                     Gson gson = new GsonBuilder().create();
                     Reader reader = new InputStreamReader(inputStream);
                     Type type = new TypeToken<List<OpenSourceLibrary>>(){}.getType();

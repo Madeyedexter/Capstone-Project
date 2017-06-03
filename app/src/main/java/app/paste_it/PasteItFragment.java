@@ -172,7 +172,7 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_PICK);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), RC_SELECT_PICTURE);
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_picture)), RC_SELECT_PICTURE);
     }
 
     @Override

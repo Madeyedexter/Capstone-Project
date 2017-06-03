@@ -19,9 +19,9 @@ public class TimePreference extends android.support.v7.preference.DialogPreferen
 
     public TimePreference(Context ctxt, AttributeSet attrs) {
         super(ctxt, attrs);
-        setTitle("Set Time");
-        setPositiveButtonText("Set");
-        setNegativeButtonText("Cancel");
+        setTitle(getContext().getString(R.string.set_time));
+        setPositiveButtonText(getContext().getString(R.string.set));
+        setNegativeButtonText(getContext().getString(R.string.cancel));
     }
 
 

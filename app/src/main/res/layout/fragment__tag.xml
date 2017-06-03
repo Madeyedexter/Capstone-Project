@@ -55,6 +55,7 @@
                     android:layout_marginEnd="20dp"
                     android:layout_marginRight="20dp"
                     android:layout_weight="1"
+                    android:contentDescription="@string/add_new_tag"
                     android:background="?selectableItemBackgroundBorderless"
                     app:srcCompat="@drawable/ic_add_black_24dp" />
             </LinearLayout>

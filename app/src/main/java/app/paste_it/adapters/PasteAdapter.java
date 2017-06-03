@@ -112,10 +112,10 @@ public class PasteAdapter extends SelectableAdapter {
                 layoutParams.setFullSpan(true);
                 break;
             case ITEM_TYPE_ERROR:
-                ((TextHolder) holder).setLightMessage("An error occurred while fetching data");
+                ((TextHolder) holder).setLightMessage(holder.itemView.getContext().getString(R.string.error_fetching_data));
                 break;
             case ITEM_TYPE_ENDED:
-                ((TextHolder) holder).setLightMessage("End of Content.");
+                ((TextHolder) holder).setLightMessage(holder.itemView.getContext().getString(R.string.end_of_data));
                 break;
             case ITEM_TYPE_IDLE:
                 ((TextHolder) holder).tvMessage.setVisibility(View.GONE);
