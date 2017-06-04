@@ -1,5 +1,5 @@
 # Capstone-Project
-Final Udacity AND project
+This app started out as project Capstone for Udacity's Android developer nano degree. I will actively make updates to the project until I find an idea for another app.
 
 # Running the app
 * Create a new firebase project from the firebase console.
