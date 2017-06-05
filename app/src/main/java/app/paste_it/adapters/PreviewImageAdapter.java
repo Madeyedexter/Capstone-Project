@@ -1,5 +1,6 @@
 package app.paste_it.adapters;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -40,16 +41,26 @@ public class PreviewImageAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        //here we bind the image to the image vioew. if the image that is being bound has the same size and name as
+        //the one which is already bound, we don't set the image bitmap, saving us some time.
+        Context context = holder.itemView.getContext();
+        String boundFileName = holder.itemView.getTag().toString();
+        long boundFileSize = Utils.getFileSize(context, boundFileName);
+        //the current file that should be bound
         ImageView imageView = (ImageView) holder.itemView;
-        String path = Utils.getFullPath(imageView.getContext(), models.get(position).getFileName());
+        String path = Utils.getFullPath(context, models.get(position).getFileName());
         File file = new File(path);
-        if (file.exists()) {
-            Picasso.with(imageView.getContext()).load(file).into(imageView);
-        } else if(models.get(position).getDownloadURL()!=null){
-            Picasso.with(imageView.getContext()).load(models.get(position).getDownloadURL()).into(imageView);
-        } else{
-            imageView.setImageBitmap(null);
+        if (!models.get(position).getFileName().equals(boundFileName) || boundFileSize != file.length()) {
+            if (file.exists()) {
+                Picasso.with(imageView.getContext()).load(file).into(imageView);
+            } else if (models.get(position).getDownloadURL() != null) {
+                Picasso.with(imageView.getContext()).load(models.get(position).getDownloadURL()).into(imageView);
+            } else {
+                imageView.setImageBitmap(null);
+            }
         }
+        holder.itemView.setTag(models.get(position).getFileName());
+
     }
 
     @Override

@@ -5,10 +5,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.inputmethod.InputMethodManager;
+
+import java.io.File;
 
 public final class Utils {
 
@@ -70,5 +73,10 @@ public final class Utils {
 
     public static String getFullPath(Context context, String fileName) {
         return context.getFilesDir().getPath() + "/" + fileName;
+    }
+
+    public static long getFileSize(Context context, @Nullable String boundFileName) {
+        File file = new File(getFullPath(context, boundFileName));
+        return file.length();
     }
 }
