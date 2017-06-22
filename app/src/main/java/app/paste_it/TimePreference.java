@@ -6,22 +6,12 @@ import android.util.AttributeSet;
 
 public class TimePreference extends android.support.v7.preference.DialogPreference{
 
-    public static int getHour(String time) {
-        String[] pieces=time.split(":");
-
-        return(Integer.parseInt(pieces[0]));
-    }
-
-    public static int getMinute(String time) {
-        String[] pieces=time.split(":");
-        return(Integer.parseInt(pieces[1]));
-    }
-
     public TimePreference(Context ctxt, AttributeSet attrs) {
         super(ctxt, attrs);
         setTitle(getContext().getString(R.string.set_time));
         setPositiveButtonText(getContext().getString(R.string.set));
         setNegativeButtonText(getContext().getString(R.string.cancel));
+        setDialogLayoutResource(R.layout.timepicker);
     }
 
 
@@ -46,7 +36,10 @@ public class TimePreference extends android.support.v7.preference.DialogPreferen
         else {
             time=defaultValue.toString();
         }
-        int lastHour = getHour(time);
-        int lastMinute = getMinute(time);
+        setSummary(time);
+    }
+
+    public boolean persistTime(String value){
+        return persistString(value);
     }
 }

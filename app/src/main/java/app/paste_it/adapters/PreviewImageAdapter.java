@@ -44,7 +44,7 @@ public class PreviewImageAdapter extends RecyclerView.Adapter {
         //here we bind the image to the image vioew. if the image that is being bound has the same size and name as
         //the one which is already bound, we don't set the image bitmap, saving us some time.
         Context context = holder.itemView.getContext();
-        String boundFileName = holder.itemView.getTag().toString();
+        String boundFileName = holder.itemView.getTag()!=null?holder.itemView.getTag().toString():null;
         long boundFileSize = Utils.getFileSize(context, boundFileName);
         //the current file that should be bound
         ImageView imageView = (ImageView) holder.itemView;
@@ -55,6 +55,8 @@ public class PreviewImageAdapter extends RecyclerView.Adapter {
                 Picasso.with(imageView.getContext()).load(file).into(imageView);
             } else if (models.get(position).getDownloadURL() != null) {
                 Picasso.with(imageView.getContext()).load(models.get(position).getDownloadURL()).into(imageView);
+                //we do not have the file stored locally, download the file
+
             } else {
                 imageView.setImageBitmap(null);
             }

@@ -30,12 +30,16 @@
 
     </android.support.design.widget.CoordinatorLayout>
     <!-- The navigation drawer -->
+    <android.support.design.widget.NavigationView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvLeftDrawer"
-        android:layout_width="240dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
         android:background="#FFF" />
+    </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>
 

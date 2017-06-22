@@ -22,6 +22,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -228,6 +230,7 @@ public class PastesFragment extends Fragment implements View.OnClickListener, Pa
 
         AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
         ActionBar actionBar = appCompatActivity.getSupportActionBar();
+
         //change view based on section
         if (getArguments().getString(ARG1).equals(getString(R.string.pastes))) {
             actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), R.color.colorPrimary)));

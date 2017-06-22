@@ -52,10 +52,18 @@
         <service
             android:name=".service.ImageImportService"
             android:exported="false" />
+        <service
+            android:exported="false"
+            android:name=".service.NotificationService">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
 
         <activity
             android:name=".SettingsActivity"
             android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ShareActivity"
