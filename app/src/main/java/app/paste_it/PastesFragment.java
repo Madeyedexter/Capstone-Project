@@ -255,6 +255,7 @@ public class PastesFragment extends Fragment implements View.OnClickListener, Pa
         switch (v.getId()) {
 
             case R.id.fabNewPaste:
+                stopActionMode();
                 startPasteItActivity(new Paste());
                 break;
         }
@@ -314,6 +315,12 @@ public class PastesFragment extends Fragment implements View.OnClickListener, Pa
         } else {
             actionMode.setTitle(String.valueOf(count));
             actionMode.invalidate();
+        }
+    }
+
+    private void stopActionMode(){
+        if(actionMode!=null){
+            actionMode.finish();
         }
     }
 

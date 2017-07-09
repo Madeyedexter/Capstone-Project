@@ -249,7 +249,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDrawerOpened(View drawerView) {
+        //retrieve the paste count
+        updatePasteCount();
+    }
 
+    private void updatePasteCount() {
+        String userId= FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
     @Override
@@ -261,4 +266,6 @@ public class MainActivity extends AppCompatActivity implements
     public void onDrawerStateChanged(int newState) {
 
     }
+
+
 }

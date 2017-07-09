@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="app.paste_it.AboutActivity"
-    android:maxWidth="600dp"
-    android:layout_gravity="center">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="16dp"
-        android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_margin="16dp"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
         <TextView
             android:gravity="center"
@@ -33,16 +28,12 @@
             android:layout_height="wrap_content"
             android:text="@string/open_source_statement"
             />
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvOpenSourceContribution"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            tools:listitem = "@layout/item_open_source_library"
-            android:nestedScrollingEnabled="true"
-            >
 
-        </android.support.v7.widget.RecyclerView>
-    </LinearLayout>
-
-</ScrollView>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvOpenSourceContribution"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:nestedScrollingEnabled="true"
+        tools:listitem="@layout/item_open_source_library" />
+</LinearLayout>
