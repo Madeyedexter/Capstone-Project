@@ -94,6 +94,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         if(preference!=null && (preference instanceof ListPreference || preference instanceof EditTextPreference || preference instanceof DialogPreference)){
             preference.setSummary(sharedPreferences.getString(preference.getKey(),null));
         }
+        if(preference instanceof TimePreference){
+            preference.setSummary(sharedPreferences.getString(preference.getKey(),"00:00"));
+        }
     }
 
     @Override

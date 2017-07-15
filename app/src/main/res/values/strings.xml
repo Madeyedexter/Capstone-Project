@@ -106,5 +106,6 @@
     <string name="time_string">%1$02d:%2$02d</string>
     <string name="day">day</string>
     <string name="time">time</string>
+    <string name="paste_count">%1$s Pastes, %2$s Archived</string>
 
 </resources>

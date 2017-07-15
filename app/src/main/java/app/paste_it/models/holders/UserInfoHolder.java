@@ -6,6 +6,10 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import app.paste_it.R;
@@ -35,5 +39,20 @@ public class UserInfoHolder extends RecyclerView.ViewHolder {
     public void bindData() {
         tvUsername.setText(firebaseUser.getDisplayName());
         Picasso.with(ivUserpic.getContext()).load(firebaseUser.getPhotoUrl()).into(ivUserpic);
+        FirebaseDatabase.getInstance().getReference("totals").child(firebaseUser.getUid()).addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String totalCount = dataSnapshot.child("totalCount").getValue().toString();
+                        String totalArchivedCount = dataSnapshot.child("totalArchivedCount").getValue().toString();
+                        tvPasteCount.setText(tvPasteCount.getContext().getString(R.string.paste_count,totalCount,totalArchivedCount));
+                        tvPasteCount.setVisibility(View.VISIBLE);
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                }
+        );
+
     }
 }

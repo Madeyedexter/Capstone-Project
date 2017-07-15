@@ -4,72 +4,97 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
-import app.paste_it.adapters.DrawerAdapter;
+import java.util.HashMap;
+import java.util.Map;
+
 import app.paste_it.models.Tag;
 import app.paste_it.service.ImageUploadService;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements
         DrawerLayout.DrawerListener, View.OnClickListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //views
+
     @BindView(R.id.drawer_layout)
     DrawerLayout drawerLayout;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @BindView(R.id.rvLeftDrawer)
-    RecyclerView rvLeftDrawer;
+    @BindView(R.id.drawer_navigation_view)
+    NavigationView navigationView;
+
+    //unable to bind these views with ButterKnife
+    CircleImageView ivUserPic;
+    TextView tvUsername;
+    TextView tvPasteCount;
+
+    //a map to maintain tags information
+    private Map<Integer,Tag> tagsMap = new HashMap<>();
+
+
+    MenuItem tagMenus;
 
     private DatabaseReference userTagsDbReference = FirebaseDatabase.getInstance().getReference("tags").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+    private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private ChildEventListener userTagsChildEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             Tag tag = dataSnapshot.getValue(Tag.class);
-            DrawerAdapter drawerAdapter = (DrawerAdapter) rvLeftDrawer.getAdapter();
-            drawerAdapter.getItems().add(tag);
-            drawerAdapter.notifyDataSetChanged();
+            //TODO add logic or tag added
+            SubMenu subMenu = tagMenus.getSubMenu();
+            MenuItem menuItem = subMenu.add(R.id.drawer_item_tag_group,tag.getId().hashCode(),Menu.NONE,tag.getLabel());
+            menuItem.setCheckable(true);
+            menuItem.setIcon(R.drawable.ic_label_black_24dp);
+            tagsMap.put(tag.getId().hashCode(),tag);
+
         }
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
             Tag tag = dataSnapshot.getValue(Tag.class);
-            DrawerAdapter drawerAdapter = (DrawerAdapter) rvLeftDrawer.getAdapter();
-            int index = PasteUtils.findIndexOfItemWithId(drawerAdapter.getItems(), tag.getId());
-            if (index > -1) {
-                drawerAdapter.getItems().set(index, tag);
-                drawerAdapter.notifyDataSetChanged();
-            }
+            SubMenu subMenu = tagMenus.getSubMenu();
+            MenuItem menuItem = subMenu.findItem(tag.getId().hashCode());
+            menuItem.setTitle(tag.getLabel());
+            tagsMap.put(tag.getId().hashCode(),tag);
         }
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
             Tag tag = dataSnapshot.getValue(Tag.class);
-            DrawerAdapter drawerAdapter = (DrawerAdapter) rvLeftDrawer.getAdapter();
-            int index = PasteUtils.findIndexOfItemWithId(drawerAdapter.getItems(), tag.getId());
-            drawerAdapter.getItems().remove(index);
-            drawerAdapter.notifyDataSetChanged();
+            SubMenu subMenu = tagMenus.getSubMenu();
+            subMenu.removeItem(tag.getId().hashCode());
+            tagsMap.remove(tag.getId().hashCode());
         }
 
         @Override
@@ -82,12 +107,50 @@ public class MainActivity extends AppCompatActivity implements
     };
     private ActionBarDrawerToggle actionBarDrawerToggle;
 
+    private NavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener = new NavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            PastesFragment pastesFragment;
+            switch (item.getItemId()){
+                case R.id.drawer_item_pastes: item.setChecked(true);
+                    setTitle(getString(R.string.pastes));
+                    pastesFragment = PastesFragment.newInstance(getString(R.string.pastes), null);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.frame, pastesFragment).commit();
+                    drawerLayout.closeDrawers();
+                    return true;
+                case R.id.drawer_item_archived: item.setChecked(true);
+                    setTitle(getString(R.string.archived));
+                    pastesFragment = PastesFragment.newInstance(getString(R.string.archived), null);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.frame, pastesFragment).commit();
+                    drawerLayout.closeDrawers();
+                    return true;
+                case R.id.drawer_item_settings:
+                    launchSettingsActivity();
+                    drawerLayout.closeDrawers();
+                    return true;
+                case R.id.drawer_item_about:
+                    launchAboutActivity();
+                    drawerLayout.closeDrawers();
+                    return true;
+                default: item.setChecked(true);
+                    Tag tag = tagsMap.get(item.getItemId());
+                    setTitle(tag.getLabel());
+                    pastesFragment = PastesFragment.newInstance(tag.getLabel(), tag);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.frame, pastesFragment).commit();
+                    drawerLayout.closeDrawers();
+                    return true;
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+
+        tagMenus = navigationView.getMenu().getItem(2);
 
         setSupportActionBar(toolbar);
 
@@ -96,30 +159,51 @@ public class MainActivity extends AppCompatActivity implements
         actionBarDrawerToggle.setDrawerSlideAnimationEnabled(true);
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+
 
         String sectionText = getString(R.string.pastes);
-        int selectedPosition = 1;
-
         if (savedInstanceState != null) {
-            linearLayoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(getString(R.string.rvOsDrawer)));
             sectionText = savedInstanceState.getString(getString(R.string.key_section));
-            selectedPosition = savedInstanceState.getInt(getString(R.string.selection_position));
         } else {
             PastesFragment pastesFragment = PastesFragment.newInstance(sectionText, null);
             getSupportFragmentManager().beginTransaction().replace(R.id.frame, pastesFragment).commit();
+            //check the first item of the navigation view
+            //check the first item of the navigation view
+            navigationView.getMenu().getItem(0).setChecked(true);
         }
         setTitle(sectionText);
-        rvLeftDrawer.setLayoutManager(linearLayoutManager);
-        DrawerAdapter drawerAdapter = new DrawerAdapter(this);
-        rvLeftDrawer.setAdapter(drawerAdapter);
-        drawerAdapter.setSelectionPosition(selectedPosition);
-        drawerAdapter.notifyDataSetChanged();
-
         userTagsDbReference.addChildEventListener(userTagsChildEventListener);
 
+        initDrawer();
 
         Utils.verifyStoragePermissions(this);
+    }
+
+    private void initDrawer() {
+        View headerView = navigationView.getHeaderView(0);
+        ivUserPic = (CircleImageView) headerView.findViewById(R.id.ivUserpic);
+        tvUsername = (TextView) headerView.findViewById(R.id.tvUsername);
+        tvPasteCount = (TextView) headerView.findViewById(R.id.tvPasteCount);
+        if(firebaseUser!=null){
+            Picasso.with(this).load(firebaseUser.getPhotoUrl()).into(ivUserPic);
+            tvUsername.setText(firebaseUser.getDisplayName());
+            FirebaseDatabase.getInstance().getReference("totals").child(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String totalCount  = dataSnapshot.child("totalCount").getValue().toString();
+                    String totalArchivedCount  = dataSnapshot.child("totalArchivedCount").getValue().toString();
+                    tvPasteCount.setText(getString(R.string.paste_count,totalCount,totalArchivedCount));
+                    tvPasteCount.setVisibility(View.VISIBLE);
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+
+
+
+        navigationView.setNavigationItemSelectedListener(onNavigationItemSelectedListener);
     }
 
     @Override
@@ -143,35 +227,8 @@ public class MainActivity extends AppCompatActivity implements
         }
         switch (v.getId()) {
             default:
-
-                final int position = Integer.parseInt(v.getTag(R.string.selection_position).toString());
-                DrawerAdapter drawerAdapter = ((DrawerAdapter) rvLeftDrawer.getAdapter());
-                if (position != drawerAdapter.getSelectionPosition() && drawerAdapter.getItemViewType(position) == DrawerAdapter.VIEW_TYPE_SECTION) {
-                    drawerAdapter.setSelectionPosition(position);
-                    drawerAdapter.notifyDataSetChanged();
-                    final String text = ((TextView) v.findViewById(R.id.tvSectionText)).getText().toString();
-                    setTitle(text);
-
-                    Tag tag = (Tag) v.getTag(R.string.tag);
-                    handleDrawerSectionSelection(tag);
-                }
         }
         drawerLayout.closeDrawer(Gravity.START, true);
-    }
-
-    private void handleDrawerSectionSelection(@Nullable Tag tag) {
-        String sectionText = getTitle().toString();
-        if (sectionText.equals(getString(R.string.pastes))) {
-            PastesFragment pastesFragment = PastesFragment.newInstance(getString(R.string.pastes), null);
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame, pastesFragment).commit();
-        } else if (sectionText.equals(getString(R.string.archived))) {
-            PastesFragment pastesFragment = PastesFragment.newInstance(getString(R.string.archived), null);
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame, pastesFragment).commit();
-        } else {
-            PastesFragment pastesFragment = PastesFragment.newInstance(sectionText, tag);
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame, pastesFragment).commit();
-        }
-
     }
 
     private void launchAboutActivity() {
@@ -186,8 +243,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(getString(R.string.rvOsDrawer), rvLeftDrawer.getLayoutManager().onSaveInstanceState());
-        outState.putInt(getString(R.string.selection_position), ((DrawerAdapter) rvLeftDrawer.getAdapter()).getSelectionPosition());
         outState.putString(getString(R.string.key_section), getTitle().toString());
         super.onSaveInstanceState(outState);
     }
@@ -259,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDrawerClosed(View drawerView) {
-        //handleDrawerSectionSelection();
+        //handleDrawerTagSelection();
     }
 
     @Override
