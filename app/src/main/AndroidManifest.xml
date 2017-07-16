@@ -17,7 +17,7 @@
         android:name=".PasteItApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/paste_it"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -28,7 +28,6 @@
             android:theme="@style/LoginActivityTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -54,11 +53,7 @@
             android:exported="false" />
         <service
             android:exported="false"
-            android:name=".service.NotificationService">
-            <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
-            </intent-filter>
-        </service>
+            android:name=".service.NotificationService"/>
 
         <activity
             android:name=".SettingsActivity"
@@ -67,7 +62,7 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ShareActivity"
-            android:theme="@style/AppTheme.Transaparent">
+            android:theme="@style/AppTheme.Transparent">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
@@ -107,11 +102,13 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/paste_it_widget_info" />
         </receiver>
+        <receiver android:name=".receivers.PasteItNotification"
+            android:enabled="true"
+            />
 
         <activity android:name=".PasteItWidgetConfigureActivity">
             <intent-filter>

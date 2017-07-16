@@ -71,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             Tag tag = dataSnapshot.getValue(Tag.class);
-            //TODO add logic or tag added
             SubMenu subMenu = tagMenus.getSubMenu();
             MenuItem menuItem = subMenu.add(R.id.drawer_item_tag_group,tag.getId().hashCode(),Menu.NONE,tag.getLabel());
             menuItem.setCheckable(true);

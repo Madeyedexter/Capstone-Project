@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -27,6 +28,17 @@ import app.paste_it.models.Tag;
 public class PasteUtils {
 
     private static final String TAG = PasteUtils.class.getSimpleName();
+
+    /**
+     * Constant representing the time elapsed in milliseconds for a single day
+     */
+    public static final long DAY_IN_MILLIS = 24*60*60*1000;
+
+    /**
+     * Constant representing the time elapsed in milliseconds for a single day
+     */
+    public static final long WEEK_IN_MILLIS = 7*24*60*60*1000;
+
 
     private PasteUtils() {
     }
@@ -110,5 +122,27 @@ public class PasteUtils {
     public static String getAgoString(Long modified) {
         PrettyTime prettyTime = new PrettyTime(Locale.getDefault());
         return prettyTime.format(new Date(modified));
+    }
+
+    public static int getCalendarWeek(String dayOfWeek, Context context) {
+        if(dayOfWeek.equals(context.getString(R.string.sunday))){
+            return Calendar.SUNDAY;
+        } else
+        if(dayOfWeek.equals(context.getString(R.string.monday))){
+            return Calendar.MONDAY;
+        } else
+        if(dayOfWeek.equals(context.getString(R.string.tuesday))){
+            return Calendar.TUESDAY;
+        } else
+        if(dayOfWeek.equals(context.getString(R.string.wednesday))){
+            return Calendar.WEDNESDAY;
+        } else
+        if(dayOfWeek.equals(context.getString(R.string.thursday))){
+            return Calendar.THURSDAY;
+        } else
+        if(dayOfWeek.equals(context.getString(R.string.friday))){
+            return Calendar.FRIDAY;
+        }
+        else return Calendar.SATURDAY;
     }
 }

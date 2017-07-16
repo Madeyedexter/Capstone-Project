@@ -85,7 +85,6 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
      * @param paste The Paste being shown in this fragment
      * @return A new instance of fragment PasteItFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static PasteItFragment newInstance(Paste paste) {
         PasteItFragment fragment = new PasteItFragment();
         Bundle args = new Bundle();
@@ -112,8 +111,6 @@ public class PasteItFragment extends Fragment implements SharedPreferences.OnSha
         }
         PreferenceManager.getDefaultSharedPreferences(getContext()).registerOnSharedPreferenceChangeListener(this);
     }
-
-    //todo: parcel paste object
 
     @Override
     public void onSaveInstanceState(Bundle outState) {

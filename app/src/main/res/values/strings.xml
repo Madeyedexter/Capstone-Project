@@ -107,5 +107,9 @@
     <string name="day">day</string>
     <string name="time">time</string>
     <string name="paste_count">%1$s Pastes, %2$s Archived</string>
+    <string name="notification_title">View content you saved.</string>
+    <string name="notification_text">You saved %1$s pastes since %2$s</string>
+    <string name="yesterday">yesterday</string>
+    <string name="last_week">last week</string>
 
 </resources>
