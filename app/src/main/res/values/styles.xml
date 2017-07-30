@@ -7,21 +7,28 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorControlNormal">@color/white</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
     </style>
 
     <style name="LoginActivityTheme" parent="Theme.AppCompat.NoActionBar">
-
     </style>
+
+    <style name="AppTheme.StatusBar" parent="AppTheme">
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+    </style>
+
 
     <style name="AppTheme.Transparent" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:backgroundDimEnabled">true</item>
         </style>
+
+    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="spinBars">true</item>
+        <item name="color">@android:color/white</item>
+    </style>
 
 </resources>

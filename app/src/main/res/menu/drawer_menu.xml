@@ -16,11 +16,12 @@
                 <group android:checkableBehavior="single"
                     android:id="@+id/drawer_item_tag_group">
                 </group>
-
             </menu>
         </item>
     </group>
-    <group android:id="@+id/uncheckable_items">
+    <group android:id="@+id/uncheckable_items"
+        android:checkableBehavior="none"
+        >
     <item android:id="@+id/drawer_item_settings"
         android:title="@string/settings"
         android:checkable="false"

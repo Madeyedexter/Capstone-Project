@@ -111,5 +111,6 @@
     <string name="notification_text">You saved %1$s pastes since %2$s</string>
     <string name="yesterday">yesterday</string>
     <string name="last_week">last week</string>
+    <string name="key_ui_props">key_ui_props</string>
 
 </resources>

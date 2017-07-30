@@ -4,6 +4,7 @@ package app.paste_it;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -230,17 +231,16 @@ public class PastesFragment extends Fragment implements View.OnClickListener, Pa
 
         AppCompatActivity appCompatActivity = (AppCompatActivity) getActivity();
         ActionBar actionBar = appCompatActivity.getSupportActionBar();
-
         //change view based on section
-        if (getArguments().getString(ARG1).equals(getString(R.string.pastes))) {
+
+        if (getString(R.string.pastes).equals(getArguments().getString(ARG1))) {
             actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), R.color.colorPrimary)));
             fabNewPaste.setOnClickListener(this);
 
-        } else if (getArguments().getString(ARG1).equals(getString(R.string.archived))) {
-            actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), R.color.colorBlueGrey)));
+        } else if (getString(R.string.archived).equals(getArguments().getString(ARG1))) {
+            actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), R.color.md_blue_grey_500_color_code)));
             fabNewPaste.hide();
         } else {
-
             actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(getContext(), R.color.colorTeal)));
             fabNewPaste.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getContext(), R.color.colorPink)));
             fabNewPaste.setOnClickListener(this);

@@ -3,13 +3,19 @@ package app.paste_it;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
@@ -33,13 +39,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import app.paste_it.models.Tag;
+import app.paste_it.models.UIProps;
 import app.paste_it.service.ImageUploadService;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends AppCompatActivity implements
-        DrawerLayout.DrawerListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, DrawerLayout.DrawerListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //views
@@ -60,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements
 
     //a map to maintain tags information
     private Map<Integer,Tag> tagsMap = new HashMap<>();
+    private UIProps uiProps;
 
 
     MenuItem tagMenus;
@@ -76,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements
             menuItem.setCheckable(true);
             menuItem.setIcon(R.drawable.ic_label_black_24dp);
             tagsMap.put(tag.getId().hashCode(),tag);
+            menuItem.setChecked(menuItem.getItemId()==uiProps.getKeySelectedDrawerTag());
 
         }
 
@@ -111,15 +119,22 @@ public class MainActivity extends AppCompatActivity implements
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             PastesFragment pastesFragment;
             switch (item.getItemId()){
-                case R.id.drawer_item_pastes: item.setChecked(true);
+                case R.id.drawer_item_pastes:
+                    unCheckTagMenuItems();
+                    item.setChecked(true);
                     setTitle(getString(R.string.pastes));
+                    uiProps.setKeySelectedDrawerTag(-1);
                     pastesFragment = PastesFragment.newInstance(getString(R.string.pastes), null);
+                    drawerLayout.setStatusBarBackgroundColor(ContextCompat.getColor(MainActivity.this,R.color.colorPrimaryDark));
                     getSupportFragmentManager().beginTransaction().replace(R.id.frame, pastesFragment).commit();
                     drawerLayout.closeDrawers();
                     return true;
                 case R.id.drawer_item_archived: item.setChecked(true);
+                    unCheckTagMenuItems();
                     setTitle(getString(R.string.archived));
+                    uiProps.setKeySelectedDrawerTag(-1);
                     pastesFragment = PastesFragment.newInstance(getString(R.string.archived), null);
+                    drawerLayout.setStatusBarBackgroundColor(ContextCompat.getColor(MainActivity.this,R.color.md_blue_grey_700_color_code));
                     getSupportFragmentManager().beginTransaction().replace(R.id.frame, pastesFragment).commit();
                     drawerLayout.closeDrawers();
                     return true;
@@ -131,16 +146,21 @@ public class MainActivity extends AppCompatActivity implements
                     launchAboutActivity();
                     drawerLayout.closeDrawers();
                     return true;
-                default: item.setChecked(true);
+                default:
+                    unCheckTagMenuItems();
+                    item.setChecked(true);
                     Tag tag = tagsMap.get(item.getItemId());
                     setTitle(tag.getLabel());
                     pastesFragment = PastesFragment.newInstance(tag.getLabel(), tag);
+                    drawerLayout.setStatusBarBackgroundColor(ContextCompat.getColor(MainActivity.this,R.color.md_teal_700_color_code));
                     getSupportFragmentManager().beginTransaction().replace(R.id.frame, pastesFragment).commit();
                     drawerLayout.closeDrawers();
+                    uiProps.setKeySelectedDrawerTag(item.getItemId());
                     return true;
             }
         }
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,27 +173,19 @@ public class MainActivity extends AppCompatActivity implements
 
         setSupportActionBar(toolbar);
 
-        drawerLayout.addDrawerListener(this);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_closed);
-        actionBarDrawerToggle.setDrawerSlideAnimationEnabled(true);
-        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
+        initUIProps(savedInstanceState);
+        initDrawer();
 
 
-
-        String sectionText = getString(R.string.pastes);
-        if (savedInstanceState != null) {
-            sectionText = savedInstanceState.getString(getString(R.string.key_section));
-        } else {
-            PastesFragment pastesFragment = PastesFragment.newInstance(sectionText, null);
+        if (savedInstanceState == null) {
+            PastesFragment pastesFragment = PastesFragment.newInstance(uiProps.getSectionText(), null);
             getSupportFragmentManager().beginTransaction().replace(R.id.frame, pastesFragment).commit();
-            //check the first item of the navigation view
             //check the first item of the navigation view
             navigationView.getMenu().getItem(0).setChecked(true);
         }
-        setTitle(sectionText);
         userTagsDbReference.addChildEventListener(userTagsChildEventListener);
 
-        initDrawer();
+
 
         Utils.verifyStoragePermissions(this);
     }
@@ -189,8 +201,8 @@ public class MainActivity extends AppCompatActivity implements
             FirebaseDatabase.getInstance().getReference("totals").child(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    String totalCount  = dataSnapshot.child("totalCount").getValue().toString();
-                    String totalArchivedCount  = dataSnapshot.child("totalArchivedCount").getValue().toString();
+                    String totalCount  = dataSnapshot.child("totalCount").getValue()!=null?dataSnapshot.child("totalCount").getValue().toString():"0";
+                    String totalArchivedCount  = dataSnapshot.child("totalArchivedCount").getValue()!=null?dataSnapshot.child("totalArchivedCount").getValue().toString():"0";
                     tvPasteCount.setText(getString(R.string.paste_count,totalCount,totalArchivedCount));
                     tvPasteCount.setVisibility(View.VISIBLE);
                 }
@@ -199,10 +211,28 @@ public class MainActivity extends AppCompatActivity implements
                 }
             });
         }
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_closed);
+        //actionBarDrawerToggle.setDrawerSlideAnimationEnabled(true);
+        //actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
+        actionBarDrawerToggle.syncState();
 
+        toolbar.setNavigationIcon(new DrawerArrowDrawable(this));
 
-
+        drawerLayout.addDrawerListener(this);
+        tagMenus.getSubMenu().setGroupCheckable(R.id.drawer_item_tag_group,true,true);
         navigationView.setNavigationItemSelectedListener(onNavigationItemSelectedListener);
+    }
+
+    private void initUIProps(Bundle savedInstanceState){
+        if(savedInstanceState==null) {
+            uiProps = new UIProps();
+            uiProps.setStatusBarBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+            uiProps.setSectionText(getString(R.string.pastes));
+        }
+        else
+            uiProps = savedInstanceState.getParcelable(getString(R.string.key_ui_props));
+        setTitle(uiProps.getSectionText());
+        drawerLayout.setStatusBarBackgroundColor(uiProps.getStatusBarBackgroundColor());
     }
 
     @Override
@@ -242,7 +272,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString(getString(R.string.key_section), getTitle().toString());
+        uiProps.setStatusBarBackgroundColor(((ColorDrawable)drawerLayout.getStatusBarBackgroundDrawable()).getColor());
+        outState.putParcelable(getString(R.string.key_ui_props),uiProps);
         super.onSaveInstanceState(outState);
     }
 
@@ -295,31 +326,30 @@ public class MainActivity extends AppCompatActivity implements
         super.onStop();
     }
 
+    private void unCheckTagMenuItems(){
+        SubMenu subMenu = tagMenus.getSubMenu();
+        for(int i=0;i<subMenu.size();i++){
+            subMenu.getItem(i).setChecked(false);
+        }
+    }
 
     @Override
     public void onDrawerSlide(View drawerView, float slideOffset) {
-
+        actionBarDrawerToggle.syncState();
     }
 
     @Override
     public void onDrawerOpened(View drawerView) {
-        //retrieve the paste count
-        updatePasteCount();
-    }
-
-    private void updatePasteCount() {
-        String userId= FirebaseAuth.getInstance().getCurrentUser().getUid();
+        actionBarDrawerToggle.syncState();
     }
 
     @Override
     public void onDrawerClosed(View drawerView) {
-        //handleDrawerTagSelection();
+        actionBarDrawerToggle.syncState();
     }
 
     @Override
     public void onDrawerStateChanged(int newState) {
 
     }
-
-
 }
